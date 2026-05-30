@@ -1,0 +1,74 @@
+{
+  "tkt-001": {
+    "duplicate": {
+      "text": "POSSIBLE_DUPLICATE was assigned because the active record sr2026-024108 matches on intersection (Wychwood / Tyrrel), service_request_type (Graffiti), and is currently In Progress. The duplicate_score is 0.74 — strong but not full DUPLICATE, because the location signal is intersection-level rather than exact lat/lon.",
+      "audit_refs": ["aud-003"]
+    },
+    "urgency": {
+      "text": "Urgency was scored 0.18: category_base 0.15 + keyword_boost 0.05 − penalty 0.02, with no hazard boost. Below the 0.45 threshold so the route is LOW_URGENCY_SCHEDULING. No hard-route flags fired.",
+      "audit_refs": ["aud-004"]
+    },
+    "category": {
+      "text": "Top category is Graffiti (Municipal Licensing & Standards → Investigation Services) with confidence 0.62 and a 0.38 margin over the runner-up — comfortably above the SUGGESTED_CATEGORY threshold.",
+      "audit_refs": ["aud-002"]
+    },
+    "schedule": {
+      "text": "This ticket was proposed for slot 2026-01-17 10:00, batched onto operation op-001 — the same intersection, same category, same ward, same crew. See the Schedule view for the explanation.",
+      "audit_refs": ["aud-004"]
+    }
+  },
+  "tkt-002": {
+    "urgency": {
+      "text": "Urgency 0.58 (MEDIUM_REVIEW_OR_QUEUE): the hazard boost from blocking_road=true added 0.22 on top of the category base 0.32. Routed to HUMAN_WORKFLOW because medium-urgency tickets are not auto-scheduled.",
+      "audit_refs": ["aud-007"]
+    },
+    "category": {
+      "text": "Road Pothole / Road Damage at confidence 0.71, margin 0.52 — high confidence, clear winner.",
+      "audit_refs": ["aud-006"]
+    },
+    "duplicate": {
+      "text": "No active duplicates found within the metadata-filter window. duplicate_score 0.12 — well below the POSSIBLE_DUPLICATE threshold.",
+      "audit_refs": []
+    }
+  },
+  "tkt-003": {
+    "urgency": {
+      "text": "Two hard-route flags fired: traffic_signal_issue=true and active_danger=true. These force HIGH_URGENCY_HUMAN_REVIEW regardless of the numeric score (which on its own reached 0.94). The dashboard surfaces this for immediate operator action.",
+      "audit_refs": ["aud-010"]
+    },
+    "category": {
+      "text": "Traffic Signal Issue with confidence 0.78 and margin 0.64 — the highest-confidence category prediction in the current demo set.",
+      "audit_refs": ["aud-009"]
+    }
+  },
+  "tkt-004": {
+    "urgency": {
+      "text": "Urgency 0.82 — both flooding and sewage_or_water_issue contributed hazard boosts (+0.18 each). No hard-route flag fired but the numeric score crosses the 0.75 HIGH_URGENCY threshold.",
+      "audit_refs": ["aud-013"]
+    },
+    "category": {
+      "text": "Flooded Basement (Toronto Water → District Operations) at confidence 0.74. Secondary candidate Sewer Backup at 0.19 — both relevant; primary category is enough for routing.",
+      "audit_refs": ["aud-012"]
+    }
+  },
+  "tkt-005": {
+    "duplicate": {
+      "text": "DUPLICATE of tkt-001: same intersection (Wychwood / Tyrrel), same category (Graffiti), tkt-001 is still In Progress, and this report came in less than an hour after the original. duplicate_score 0.93 — well past the DUPLICATE threshold.",
+      "audit_refs": ["aud-014"]
+    },
+    "route": {
+      "text": "Routed to DUPLICATE_WORKFLOW — this ticket is merged onto tkt-001 as evidence rather than scheduled separately.",
+      "audit_refs": ["aud-015"]
+    }
+  },
+  "tkt-006": {
+    "category": {
+      "text": "UNCERTAIN_CATEGORY: top confidence is 0.41 (Damaged Concrete Sidewalk), runner-up is 0.36 (Road Pothole / Road Damage) — margin of only 0.05. The pipeline doesn't pick when the margin is this small; it surfaces the top-K for an operator to confirm or override.",
+      "audit_refs": ["aud-016"]
+    },
+    "route": {
+      "text": "Routed to HUMAN_WORKFLOW for category confirmation. Low-urgency tickets are normally auto-scheduled, but uncertain category short-circuits that — we don't want to batch a sidewalk repair onto a pothole crew if it's the wrong call.",
+      "audit_refs": ["aud-017"]
+    }
+  }
+}

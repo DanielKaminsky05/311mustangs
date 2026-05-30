@@ -1,0 +1,164 @@
+[
+  {
+    "ticket_id": "tkt-001",
+    "source": "whatsapp",
+    "description": "There is graffiti on a stop sign near Wychwood and Tyrrel.",
+    "location": {
+      "raw_text": "Wychwood Ave and Tyrrel Ave",
+      "intersection_street_1": "Wychwood Ave",
+      "intersection_street_2": "Tyrrel Ave",
+      "postal_code_or_fsa": "M6G",
+      "ward": "Toronto-St. Paul's (12)",
+      "latitude": null,
+      "longitude": null
+    },
+    "observed_at": "2026-01-15T19:48:00",
+    "reported_at": "2026-01-15T19:51:00",
+    "hazard_flags": {
+      "injury": false,
+      "active_danger": false,
+      "blocking_road": false,
+      "blocking_sidewalk": false,
+      "flooding": false,
+      "sewage_or_water_issue": false,
+      "traffic_signal_issue": false
+    },
+    "media_refs": [],
+    "metadata": {}
+  },
+  {
+    "ticket_id": "tkt-002",
+    "source": "whatsapp",
+    "description": "Large pothole on Yonge just south of Eglinton, taking up the right lane. Cars are swerving around it.",
+    "location": {
+      "raw_text": "Yonge St near Eglinton",
+      "intersection_street_1": "Yonge St",
+      "intersection_street_2": "Eglinton Ave E",
+      "postal_code_or_fsa": "M4P",
+      "ward": "Eglinton-Lawrence (8)",
+      "latitude": null,
+      "longitude": null
+    },
+    "observed_at": "2026-01-15T18:22:00",
+    "reported_at": "2026-01-15T18:25:00",
+    "hazard_flags": {
+      "injury": false,
+      "active_danger": false,
+      "blocking_road": true,
+      "blocking_sidewalk": false,
+      "flooding": false,
+      "sewage_or_water_issue": false,
+      "traffic_signal_issue": false
+    },
+    "media_refs": [],
+    "metadata": {}
+  },
+  {
+    "ticket_id": "tkt-003",
+    "source": "whatsapp",
+    "description": "Traffic light is dark at Bloor and Spadina. Cars are treating it as a 4-way stop but it's not safe.",
+    "location": {
+      "raw_text": "Bloor St W and Spadina Ave",
+      "intersection_street_1": "Bloor St W",
+      "intersection_street_2": "Spadina Ave",
+      "postal_code_or_fsa": "M5R",
+      "ward": "University-Rosedale (11)",
+      "latitude": null,
+      "longitude": null
+    },
+    "observed_at": "2026-01-15T19:55:00",
+    "reported_at": "2026-01-15T19:57:00",
+    "hazard_flags": {
+      "injury": false,
+      "active_danger": true,
+      "blocking_road": false,
+      "blocking_sidewalk": false,
+      "flooding": false,
+      "sewage_or_water_issue": false,
+      "traffic_signal_issue": true
+    },
+    "media_refs": [],
+    "metadata": {}
+  },
+  {
+    "ticket_id": "tkt-004",
+    "source": "whatsapp",
+    "description": "Basement is flooding, smells like sewage. Water is coming up through the floor drain.",
+    "location": {
+      "raw_text": "near Pape and Danforth",
+      "intersection_street_1": "Pape Ave",
+      "intersection_street_2": "Danforth Ave",
+      "postal_code_or_fsa": "M4K",
+      "ward": "Toronto-Danforth (14)",
+      "latitude": null,
+      "longitude": null
+    },
+    "observed_at": "2026-01-15T19:30:00",
+    "reported_at": "2026-01-15T19:34:00",
+    "hazard_flags": {
+      "injury": false,
+      "active_danger": false,
+      "blocking_road": false,
+      "blocking_sidewalk": false,
+      "flooding": true,
+      "sewage_or_water_issue": true,
+      "traffic_signal_issue": false
+    },
+    "media_refs": [],
+    "metadata": {}
+  },
+  {
+    "ticket_id": "tkt-005",
+    "source": "whatsapp",
+    "description": "Still graffiti on the stop sign at Wychwood and Tyrrel — same one someone reported earlier, hasn't been cleaned.",
+    "location": {
+      "raw_text": "Wychwood Ave at Tyrrel Ave",
+      "intersection_street_1": "Wychwood Ave",
+      "intersection_street_2": "Tyrrel Ave",
+      "postal_code_or_fsa": "M6G",
+      "ward": "Toronto-St. Paul's (12)",
+      "latitude": null,
+      "longitude": null
+    },
+    "observed_at": "2026-01-15T20:02:00",
+    "reported_at": "2026-01-15T20:03:00",
+    "hazard_flags": {
+      "injury": false,
+      "active_danger": false,
+      "blocking_road": false,
+      "blocking_sidewalk": false,
+      "flooding": false,
+      "sewage_or_water_issue": false,
+      "traffic_signal_issue": false
+    },
+    "media_refs": [],
+    "metadata": {}
+  },
+  {
+    "ticket_id": "tkt-006",
+    "source": "whatsapp",
+    "description": "Something weird is going on with the road, hard to describe — looks broken near the curb.",
+    "location": {
+      "raw_text": "near Dufferin and Bloor",
+      "intersection_street_1": "Dufferin St",
+      "intersection_street_2": "Bloor St W",
+      "postal_code_or_fsa": "M6H",
+      "ward": "Davenport (9)",
+      "latitude": null,
+      "longitude": null
+    },
+    "observed_at": "2026-01-15T19:10:00",
+    "reported_at": "2026-01-15T19:12:00",
+    "hazard_flags": {
+      "injury": false,
+      "active_danger": false,
+      "blocking_road": false,
+      "blocking_sidewalk": false,
+      "flooding": false,
+      "sewage_or_water_issue": false,
+      "traffic_signal_issue": false
+    },
+    "media_refs": [],
+    "metadata": {}
+  }
+]

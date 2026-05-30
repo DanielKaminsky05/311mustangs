@@ -1,0 +1,20 @@
+[
+  {
+    "assignment_id": "sched-001",
+    "ticket_id": "tkt-001",
+    "category": "Graffiti",
+    "proposed_slot": "2026-01-17T10:00:00",
+    "rank": 1,
+    "explanation": "Batches with op-001 — same intersection (Wychwood / Tyrrel), same service_request_type (Graffiti), same ward (Toronto-St. Paul's). Crew already scheduled; marginal cost low.",
+    "batches_with": "op-001"
+  },
+  {
+    "assignment_id": "sched-002",
+    "ticket_id": "tkt-006",
+    "category": "Damaged Concrete Sidewalk",
+    "proposed_slot": "2026-01-18T09:00:00",
+    "rank": 2,
+    "explanation": "Batches with op-004 — same intersection (Dufferin / Bloor W), same section (Road Operations). Category inferred with low confidence (0.41); flagged for operator confirmation.",
+    "batches_with": "op-004"
+  }
+]

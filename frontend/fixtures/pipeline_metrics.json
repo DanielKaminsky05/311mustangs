@@ -1,0 +1,13 @@
+{
+  "gpu_enabled": true,
+  "device": "NVIDIA H100 80GB",
+  "rapids_cudf_version": "25.04",
+  "embedding_backend": "NIM",
+  "embedding_model": "nv-embed-v2",
+  "vector_backend": "cuVS",
+  "records_indexed": 190432,
+  "active_records": 8217,
+  "no_external_api_in_triage_path": true,
+  "indexed_at": "2026-05-29 21:14",
+  "data_pipeline_report_path": "var/data_pipeline_report.md"
+}

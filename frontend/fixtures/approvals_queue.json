@@ -1,0 +1,30 @@
+[
+  {
+    "ticket_id": "tkt-002",
+    "firing_reason": "blocking_road=true; urgency_decision=MEDIUM_REVIEW_OR_QUEUE",
+    "status": "pending",
+    "decided_at": null,
+    "decided_by": null
+  },
+  {
+    "ticket_id": "tkt-003",
+    "firing_reason": "HARD-ROUTE: traffic_signal_issue, active_danger",
+    "status": "pending",
+    "decided_at": null,
+    "decided_by": null
+  },
+  {
+    "ticket_id": "tkt-004",
+    "firing_reason": "HARD-ROUTE: flooding + sewage_or_water_issue (urgency_score 0.82)",
+    "status": "pending",
+    "decided_at": null,
+    "decided_by": null
+  },
+  {
+    "ticket_id": "tkt-006",
+    "firing_reason": "category_confidence=0.41 below threshold; UNCERTAIN_CATEGORY",
+    "status": "pending",
+    "decided_at": null,
+    "decided_by": null
+  }
+]
