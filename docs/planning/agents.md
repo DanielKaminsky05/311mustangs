@@ -18,10 +18,10 @@ postal_code_or_fsa            # preferred when available
 ward                          # optional; backend may infer later if possible
 latitude / longitude          # optional; useful if frontend/map can provide it
 media_refs                    # optional image/video references
-hazard flags                  # required as explicit yes/no/unknown checks
+safety_answers                # explicit user yes/no/unknown answers, not agent hazard classification
 ```
 
-Required hazard flags:
+Required safety answer keys:
 
 ```text
 injury
@@ -33,7 +33,9 @@ sewage_or_water_issue
 traffic_signal_issue
 ```
 
-The intake agent may explain that it is collecting details for city review, but it must avoid presenting itself as the authority for final classification or urgency.
+Allowed answer values are `yes`, `no`, and `unknown`. The intake agent may record `yes` only when the user explicitly answers yes or directly states the condition. Otherwise it should ask a follow-up or record `unknown`.
+
+The intake agent may explain that it is collecting details for city review, but it must avoid presenting itself as the authority for final classification, urgency, hazards, or routing.
 
 Minimum backend payload:
 
@@ -51,14 +53,14 @@ Minimum backend payload:
     "longitude": null
   },
   "observed_at": "2026-01-15T20:00:00",
-  "hazard_flags": {
-    "injury": false,
-    "active_danger": false,
-    "blocking_road": false,
-    "blocking_sidewalk": false,
-    "flooding": false,
-    "sewage_or_water_issue": false,
-    "traffic_signal_issue": false
+  "safety_answers": {
+    "injury": "no",
+    "active_danger": "no",
+    "blocking_road": "no",
+    "blocking_sidewalk": "no",
+    "flooding": "no",
+    "sewage_or_water_issue": "no",
+    "traffic_signal_issue": "no"
   },
   "media_refs": []
 }
@@ -83,8 +85,10 @@ The backend should not embed raw JSON directly. It should embed a stable text fo
 ```text
 Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel.
 Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G.
-Hazards: injury=false; active_danger=false; blocking_road=false; blocking_sidewalk=false; flooding=false; sewage_or_water_issue=false; traffic_signal_issue=false.
+Safety signals reported: none.
 ```
+
+The full `safety_answers` and backend-normalized `hazard_flags` remain stored for audit and deterministic urgency scoring.
 
 ## Backend scheduling / reasoning agent
 
@@ -123,9 +127,9 @@ The payload must include at least:
 
 ```text
 description
-location.raw_text
-observed_at or report timestamp
-hazard_flags
+location.raw_text or another usable location signal
+observed_at or backend report timestamp
+safety_answers
 ```
 
 Intersection, FSA/postal code, ward, and lat/lon should be included whenever available because duplicate detection is only strong when location is specific.
@@ -301,7 +305,7 @@ Inputs:
 
 ```text
 category confidence distribution
-hazard flags from intake agent
+backend-normalized hazard flags derived from explicit safety_answers
 keyword/rule matches from description
 optional duplicate/workload context
 ```
@@ -330,15 +334,15 @@ urgency_score >= 0.75      -> HIGH_URGENCY_HUMAN_REVIEW
 urgency_score < 0.45       -> LOW_URGENCY_SCHEDULING
 ```
 
-Hard route flags should override the numeric score:
+Hard route flags derived from explicit `safety_answers` should override the numeric score:
 
 ```text
-injury=true
-active_danger=true
-traffic_signal_issue=true
+safety_answers.injury=yes -> hazard_flags.injury=true
+safety_answers.active_danger=yes -> hazard_flags.active_danger=true
+safety_answers.traffic_signal_issue=yes -> hazard_flags.traffic_signal_issue=true
 ```
 
-These should always force human review.
+These should always force human review after backend normalization.
 
 ## 8. Low-urgency scheduling handoff
 
