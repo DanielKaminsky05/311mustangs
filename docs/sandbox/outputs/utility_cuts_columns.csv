@@ -1,0 +1,16 @@
+column,dtype,non_null,null,null_pct,unique,example_values
+_id,int64,87880,0,0.0,87880,19573765 | 19573766 | 19573767 | 19573768 | 19573769
+permit_number,int64,87880,0,0.0,87880,999995001 | 999990001 | 999986021 | 999986020 | 999986019
+proposed_from_date,str,87880,0,0.0,908,2024-11-05 | 2024-11-21 | 2024-11-06 | 2024-11-04 | 2025-05-05
+proposed_to_date,str,87880,0,0.0,1100,2025-05-05 | 2025-05-21 | 2025-05-06 | 2024-11-07 | 2024-11-18
+client_name,str,87876,4,0.0,305,Toronto Water - CSS | Toronto Water - CSN | Toronto Water - CSW | Toronto Water - CSE | Toronto Water WA3
+geo_id,float64,87873,7,0.01,45023,71568.0 | 579373.0 | 1022040.0 | 5524316.0 | 8408040.0
+display_desc,str,87880,0,0.0,70502,154 ROBINA AVE (Between GLENHURST AVE AND EARLSDALE AVE) | 98 YORKVIEW DR (NY) (Between ELGIN RD AND BEVDALE RD) | 23 NUGENT RD (Between TYLER PL AND MARBLEHEAD RD) | 4224 BLOOR ST W (Between LEAVENWORTH CRES AND PEACOCK AVE) | 1188 KIPLING AVE (Between BYWOOD DR AND GREENING CRES)
+permit_status,str,87880,0,0.0,6,PERMIT ISSUED | COMPLETED | NO FURTHER WORK REQUIRED | ACTIVE | PLANNED
+installation_type_desc,str,87880,0,0.0,2237,Water and Sewer Connection | Chamber repair | Box and Rod repair | Catchbasin Lead | Sanitary & storm connection
+city_ward,float64,87875,5,0.01,25,9.0 | 18.0 | 2.0 | 21.0 | 7.0
+district,str,87864,16,0.02,4,Toronto and East York | North York | Etobicoke and York | Scarborough
+proposed_from_date__parsed,datetime64[us],87880,0,0.0,908,2024-11-05 00:00:00 | 2024-11-21 00:00:00 | 2024-11-06 00:00:00 | 2024-11-04 00:00:00 | 2025-05-05 00:00:00
+proposed_to_date__parsed,datetime64[us],87880,0,0.0,1100,2025-05-05 00:00:00 | 2025-05-21 00:00:00 | 2025-05-06 00:00:00 | 2024-11-07 00:00:00 | 2024-11-18 00:00:00
+permit_window_days,int64,87880,0,0.0,379,181 | 2 | 13 | 184 | 14
+has_display_location,bool,87880,0,0.0,1,True

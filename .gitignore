@@ -1,7 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# data 
+# data
 docs/data/*
+
+# python cache
+__pycache__/
+**/__pycache__/
 
 # dependencies
 /node_modules
@@ -26,9 +30,6 @@ docs/data/*
 # misc
 .DS_Store
 *.pem
-
-# python cache
-__pycache__/
 
 # debug
 npm-debug.log*

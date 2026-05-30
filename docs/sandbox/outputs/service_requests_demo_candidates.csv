@@ -1,0 +1,21 @@
+creation_date,status,first_3_chars_of_postal_code,intersection_street_1,intersection_street_2,ward,service_request_type,division,section,demo_bucket
+2026-01-01 00:27:38.0000000,Completed,Intersection,Leslie St,Finch Ave E,Don Valley North (17),Clean up Debris on Road,Transportation Services,Road Operations,potential_human_or_urgent
+2026-01-01 00:29:23.0000000,Completed,M2N,,,Willowdale (18),Sewer Service Line-Blocked,Toronto Water,District Ops,potential_human_or_urgent
+2026-01-01 00:32:12.0000000,Closed,Intersection,Lawrence Ave E,Greencrest Crct,Scarborough-Guildwood (24),Traffic Signal Repair,Transportation Services,TMC,potential_human_or_urgent
+2026-01-01 00:33:42.0000000,Completed,M8Y,,,Etobicoke-Lakeshore (03),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 00:34:02.0000000,Completed,M6H,,,Davenport (09),Residential Bin Lid Damaged,Solid Waste Management Services,Collections,potential_demo_low_priority
+2026-01-01 01:00:05.0000000,Completed,M1P,,,Scarborough Centre (21),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 01:06:16.0000000,Completed,M6N,,,York South-Weston (05),Animal Noise,Municipal Licensing & Standards,Toronto Animal Services,potential_demo_low_priority
+2026-01-01 01:23:36.0000000,Completed,M9P,,,Etobicoke Centre (02),Watermain-Possible Break,Toronto Water,District Ops,potential_human_or_urgent
+2026-01-01 01:27:56.0000000,Completed,M4C,,,Beaches-East York (19),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 01:29:11.0000000,Completed,M5J,,,Spadina-Fort York (10),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 01:35:28.0000000,Completed,M4J,,,Toronto-Danforth (14),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 01:36:46.0000000,Completed,M1S,,,Scarborough North (23),Unreasonable and Persistent Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 01:37:01.0000000,Completed,M4C,,,Beaches-East York (19),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 01:40:04.0000000,Completed,M6P,,,Parkdale-High Park (04),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 02:11:25.0000000,Completed,M9A,,,Etobicoke-Lakeshore (03),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 02:12:24.0000000,Completed,M1P,,,Scarborough Centre (21),Unreasonable and Persistent Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 02:13:59.0000000,Completed,M2N,,,Willowdale (18),Animal Noise,Municipal Licensing & Standards,Toronto Animal Services,potential_demo_low_priority
+2026-01-01 02:17:12.0000000,Completed,M1P,,,Scarborough Centre (21),Amplified or Musical Instrument Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 02:30:03.0000000,Completed,M6B,,,Eglinton-Lawrence (08),Unreasonable and Persistent Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority
+2026-01-01 02:35:33.0000000,Completed,M6B,,,Eglinton-Lawrence (08),Unreasonable and Persistent Noise,Municipal Licensing & Standards,Bylaw Enforcement,potential_demo_low_priority

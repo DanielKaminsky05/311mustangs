@@ -1,0 +1,16 @@
+column,dtype,non_null,null,null_pct,unique,example_values
+_id,int64,418,0,0.0,418,1 | 2 | 3 | 4 | 5
+calendar,str,418,0,0.0,8,Tuesday1 | Tuesday2 | Wednesday1 | Wednesday2 | Thursday1
+weekstarting,str,418,0,0.0,209,01/06/26 | 01/13/26 | 01/20/26 | 01/27/26 | 02/03/26
+greenbin,str,418,0,0.0,4,T | W | R | F
+garbage,str,418,0,0.0,5,0 | T | W | R | F
+recycling,str,418,0,0.0,5,T | 0 | W | R | F
+yardwaste,str,418,0,0.0,5,0 | T | W | R | F
+christmastree,str,418,0,0.0,5,0 | T | W | R | F
+weekstarting__parsed,datetime64[us],418,0,0.0,209,2026-01-06 00:00:00 | 2026-01-13 00:00:00 | 2026-01-20 00:00:00 | 2026-01-27 00:00:00 | 2026-02-03 00:00:00
+greenbin_bool,bool,418,0,0.0,2,True | False
+garbage_bool,bool,418,0,0.0,2,False | True
+recycling_bool,bool,418,0,0.0,2,True | False
+yardwaste_bool,bool,418,0,0.0,2,False | True
+christmastree_bool,bool,418,0,0.0,2,False | True
+active_stream_count,int64,418,0,0.0,3,2 | 3 | 0
