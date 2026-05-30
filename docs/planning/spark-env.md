@@ -15,10 +15,10 @@ We serve **two models from one Ollama process** on the GX10, one for each use ca
 
 | Model | Size (Q4) | Use case | Called by |
 |---|---|---|---|
-| `llama3.2-vision:11b` | ~7 GB | WhatsApp intake agent — reads citizen photos, asks follow-up questions, populates hazard flags | NemoClaw sandbox (routed inference) |
+| `gemma4:26b` | ~16 GB | WhatsApp intake agent — asks follow-up questions, extracts facts (description / location / safety answers), populates the structured ticket payload | NemoClaw sandbox (routed inference via `inference.local`) |
 | `nemotron:70b` | ~40 GB | Backend reasoning — explains audited decisions, narrates evidence packs for operators | FastAPI embed-service (direct Ollama API) |
 
-Both models stay resident in GB10's 128 GB unified memory (~47 GB combined) with `OLLAMA_KEEP_ALIVE=-1` so the demo never pays cold-start latency.
+Both models stay resident in GB10's 128 GB unified memory (~56 GB combined) with `OLLAMA_KEEP_ALIVE=-1` so the demo never pays cold-start latency. If `gemma4:26b` is not multimodal in the variant we pull, image input handling stays optional and never blocks intake — text-only reports remain a valid path (see `whatsapp-integration.md`).
 
 vLLM (`vllm-env`) is **kept installed as a fallback** in case Ollama hits a model-loading or throughput problem during the demo. It is not the primary runtime. Do not divert time to vLLM unless Ollama actively fails.
 
