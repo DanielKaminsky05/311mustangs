@@ -88,6 +88,7 @@ That claim is higher risk because the current 311 data has only coarse location 
 - [Proposal](./proposal.md) — overall solution framing and component responsibilities
 - [Data](./data.md) — dataset scope, pipeline artifacts, and data handoff contracts
 - [Backend](./backend.md) — backend runtime design, Redis/SQLite notes, and API draft
+- [Frontend](./frontend.md) — operator dashboard scope, screens, file upload, and backend data contract
 - [Agents](./agents.md) — multi-agent architecture, NemoClaw/OpenClaw/LangGraph integration, and shared DGX vLLM serving plan
 - [DGX Spark / NVIDIA stack](./spark-usage.md) — current NVIDIA ecosystem usage and judging-aligned implementation priorities
 - [Criteria](./criteria.md) — hackathon judging rubric

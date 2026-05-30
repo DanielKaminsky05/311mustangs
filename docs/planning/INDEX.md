@@ -7,6 +7,7 @@ Components:
 - `README.md` — current implementation priority, critical path, and pitch framing.
 - `proposal.md` — overall solution framing and component responsibilities.
 - `data.md` — dataset scope, artifacts, and runtime/persistence data flow.
+- `frontend.md` — operator dashboard scope, screens, file upload subsystem, and backend data contract.
 - `spark-usage.md` — DGX Spark/NVIDIA usage plan and judging-proof checklist.
 - `agents.md` — multi-agent architecture and model-serving/tool-boundary rules.
 - `criteria.md` — judging rubric excerpts used to prioritize work.
