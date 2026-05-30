@@ -1,0 +1,12 @@
+column,dtype,non_null,null,null_pct,unique,example_values
+creation_date,str,190511,0,0.0,187334,2026-01-01 00:21:51.0000000 | 2026-01-01 00:24:48.0000000 | 2026-01-01 00:27:38.0000000 | 2026-01-01 00:29:23.0000000 | 2026-01-01 00:32:12.0000000
+status,str,190511,0,0.0,6,Completed | Closed | In Progress | New | Cancelled
+first_3_chars_of_postal_code,str,190511,0,0.0,100,M4L | M1C | Intersection | M2N | M8Y
+intersection_street_1,str,190511,0,0.0,4615, | Leslie St | Lawrence Ave E | Frederick St | Earlthorpe Cres
+intersection_street_2,str,190511,0,0.0,4237, | Finch Ave E | Greencrest Crct | The Esplanade | Lynnbrook Dr
+ward,str,190511,0,0.0,26,Beaches-East York (19) | Scarborough-Rouge Park (25) | Don Valley North (17) | Willowdale (18) | Scarborough-Guildwood (24)
+service_request_type,str,190511,0,0.0,533,Stray - Confined | Property Standards and Maintenance Violations | Clean up Debris on Road | Sewer Service Line-Blocked | Traffic Signal Repair
+division,str,190511,0,0.0,8,"Municipal Licensing & Standards | Transportation Services | Toronto Water | Solid Waste Management Services | Environment, Climate & Forestry"
+section,str,190511,0,0.0,24,Toronto Animal Services | Investigation Services | Road Operations | District Ops | TMC
+creation_date__parsed,datetime64[ns],190511,0,0.0,187334,2026-01-01 00:21:51 | 2026-01-01 00:24:48 | 2026-01-01 00:27:38 | 2026-01-01 00:29:23 | 2026-01-01 00:32:12
+demo_bucket,str,190511,0,0.0,3,other | potential_human_or_urgent | potential_demo_low_priority

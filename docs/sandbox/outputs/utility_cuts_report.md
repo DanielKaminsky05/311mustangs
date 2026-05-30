@@ -1,0 +1,191 @@
+# Utility Cuts
+
+## Overview
+
+```json
+{
+  "source_file": "/Users/tlam/311mustangs/docs/data/util-cuts/Utility Cut Permits Data.csv",
+  "rows": 87880,
+  "columns": [
+    "_id",
+    "permit_number",
+    "proposed_from_date",
+    "proposed_to_date",
+    "client_name",
+    "geo_id",
+    "display_desc",
+    "permit_status",
+    "installation_type_desc",
+    "city_ward",
+    "district",
+    "proposed_from_date__parsed",
+    "proposed_to_date__parsed",
+    "permit_window_days",
+    "has_display_location"
+  ],
+  "date_stats": {
+    "proposed_from_date": {
+      "valid": 87880,
+      "missing_or_invalid": 0,
+      "min": "2023-12-11 00:00:00",
+      "max": "9960-01-11 00:00:00"
+    },
+    "proposed_to_date": {
+      "valid": 87880,
+      "missing_or_invalid": 0,
+      "min": "1996-01-11 00:00:00",
+      "max": "5007-01-14 00:00:00"
+    }
+  },
+  "has_exact_lat_lon": false,
+  "location_granularity": "GEO_ID plus DISPLAY_DESC street segment; no lat/lon in CSV. Good for address/street conflict demos, needs geocoding for spatial joins.",
+  "demo_feasibility": {
+    "scheduling_conflicts": "HIGH - rich permit date windows and street segment descriptions",
+    "graph_dependencies": "HIGH - can create BLOCKED_BY_UTILITY_CUT edges from active permits",
+    "route_avoidance": "MEDIUM - exact coordinates require geocoding or synthetic demo coordinate assignment"
+  }
+}
+```
+
+## Column profile
+
+| column | dtype | non_null | null | null_pct | unique | example_values |
+| --- | --- | --- | --- | --- | --- | --- |
+| _id | int64 | 87880 | 0 | 0.0 | 87880 | 19573765 \| 19573766 \| 19573767 \| 19573768 \| 19573769 |
+| permit_number | int64 | 87880 | 0 | 0.0 | 87880 | 999995001 \| 999990001 \| 999986021 \| 999986020 \| 999986019 |
+| proposed_from_date | str | 87880 | 0 | 0.0 | 908 | 2024-11-05 \| 2024-11-21 \| 2024-11-06 \| 2024-11-04 \| 2025-05-05 |
+| proposed_to_date | str | 87880 | 0 | 0.0 | 1100 | 2025-05-05 \| 2025-05-21 \| 2025-05-06 \| 2024-11-07 \| 2024-11-18 |
+| client_name | str | 87876 | 4 | 0.0 | 305 | Toronto Water - CSS \| Toronto Water - CSN \| Toronto Water - CSW \| Toronto Water - CSE \| Toronto Water WA3 |
+| geo_id | float64 | 87873 | 7 | 0.01 | 45023 | 71568.0 \| 579373.0 \| 1022040.0 \| 5524316.0 \| 8408040.0 |
+| display_desc | str | 87880 | 0 | 0.0 | 70502 | 154 ROBINA AVE (Between GLENHURST AVE AND EARLSDALE AVE) \| 98 YORKVIEW DR (NY) (Between ELGIN RD AND BEVDALE RD) \| 23 NUGENT RD (Between TYLER PL AND MARBLEHEAD RD) \| 4224 BLOOR ST W (Between LEAVENWORTH CRES AND PEACOCK AVE) \| 1188 KIPLING AVE (Between BYWOOD DR AND GREENING CRES) |
+| permit_status | str | 87880 | 0 | 0.0 | 6 | PERMIT ISSUED \| COMPLETED \| NO FURTHER WORK REQUIRED \| ACTIVE \| PLANNED |
+| installation_type_desc | str | 87880 | 0 | 0.0 | 2237 | Water and Sewer Connection \| Chamber repair \| Box and Rod repair \| Catchbasin Lead \| Sanitary & storm connection |
+| city_ward | float64 | 87875 | 5 | 0.01 | 25 | 9.0 \| 18.0 \| 2.0 \| 21.0 \| 7.0 |
+| district | str | 87864 | 16 | 0.02 | 4 | Toronto and East York \| North York \| Etobicoke and York \| Scarborough |
+| proposed_from_date__parsed | datetime64[us] | 87880 | 0 | 0.0 | 908 | 2024-11-05 00:00:00 \| 2024-11-21 00:00:00 \| 2024-11-06 00:00:00 \| 2024-11-04 00:00:00 \| 2025-05-05 00:00:00 |
+| proposed_to_date__parsed | datetime64[us] | 87880 | 0 | 0.0 | 1100 | 2025-05-05 00:00:00 \| 2025-05-21 00:00:00 \| 2025-05-06 00:00:00 \| 2024-11-07 00:00:00 \| 2024-11-18 00:00:00 |
+| permit_window_days | int64 | 87880 | 0 | 0.0 | 379 | 181 \| 2 \| 13 \| 184 \| 14 |
+| has_display_location | bool | 87880 | 0 | 0.0 | 1 | True |
+
+## Top permit statuses
+
+| permit_status | count |
+| --- | --- |
+| PERMIT ISSUED | 87389 |
+| COMPLETED | 262 |
+| PLANNED | 162 |
+| ACTIVE | 33 |
+| UNDER WARRANTY | 20 |
+| NO FURTHER WORK REQUIRED | 14 |
+
+## Top installation types
+
+| installation_type_desc | count |
+| --- | --- |
+| PERMANENT RESTORATION | 11541 |
+| Box and Rod repair | 3748 |
+| Chamber repair | 3087 |
+| COAM | 2370 |
+| Pole Removal | 2265 |
+| Water and Sewer Connection | 1999 |
+| Cable Replacement | 1845 |
+| Watermain break-repair | 1763 |
+| POLE REPLACEMENT | 1754 |
+| POLE INSTALLATION | 1711 |
+| Improved Service | 1686 |
+| COAM/RELAY | 1469 |
+| POLE REPLACEMENT & ANCHOR INSTALLATION | 1350 |
+| Water Service repair | 1313 |
+| Pole Replacement | 1266 |
+| Sewer Repair | 1109 |
+| Gas service | 1059 |
+| Pole replacement | 993 |
+| TEST PIT | 926 |
+| Pole Replacement, Anchor & Ground Rod Installation | 855 |
+| Restoration | 838 |
+| Cable repair | 833 |
+| Ground Rod Installation | 759 |
+| Pit (dig) | 730 |
+| Valve repair | 713 |
+| Pole installation | 684 |
+| Sewer Relay | 652 |
+| Road Resurfacing, Curb and Sidewalk Replacement | 648 |
+| Priority Lead Water Replacement (New Service) | 643 |
+| Pole Replacement and Ground Rod Installation | 638 |
+
+## Top wards
+
+| city_ward | count |
+| --- | --- |
+| 3.0 | 6847 |
+| 12.0 | 6190 |
+| 11.0 | 5638 |
+| 2.0 | 4454 |
+| 1.0 | 4344 |
+| 8.0 | 4337 |
+| 10.0 | 3717 |
+| 21.0 | 3685 |
+| 15.0 | 3572 |
+| 14.0 | 3453 |
+| 6.0 | 3320 |
+| 19.0 | 3285 |
+| 5.0 | 3267 |
+| 13.0 | 3237 |
+| 9.0 | 3200 |
+| 20.0 | 3175 |
+| 4.0 | 2958 |
+| 18.0 | 2931 |
+| 22.0 | 2634 |
+| 25.0 | 2516 |
+| 17.0 | 2489 |
+| 7.0 | 2366 |
+| 24.0 | 2275 |
+| 16.0 | 2094 |
+| 23.0 | 1891 |
+| <NULL> | 5 |
+
+## Top districts
+
+| district | count |
+| --- | --- |
+| Toronto and East York | 31775 |
+| Etobicoke and York | 21223 |
+| North York | 18246 |
+| Scarborough | 16620 |
+| <NULL> | 16 |
+
+## Rows with display location
+
+| has_display_location | count |
+| --- | --- |
+| True | 87880 |
+
+## Sample conflict demo candidates
+
+| permit_number | proposed_from_date | proposed_to_date | client_name | geo_id | display_desc | permit_status | installation_type_desc | city_ward | district | permit_window_days |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 999995001 | 2024-11-05 | 2025-05-05 | Toronto Water - CSS | 71568.0 | 154 ROBINA AVE (Between GLENHURST AVE AND EARLSDALE AVE) | PERMIT ISSUED | Water and Sewer Connection | 9.0 | Toronto and East York | 181 |
+| 999990001 | 2024-11-05 | 2025-05-05 | Toronto Water - CSN | 579373.0 | 98 YORKVIEW DR (NY) (Between ELGIN RD AND BEVDALE RD) | PERMIT ISSUED | Water and Sewer Connection | 18.0 | North York | 181 |
+| 999986021 | 2024-11-21 | 2025-05-21 | Toronto Water - CSW | 1022040.0 | 23 NUGENT RD (Between TYLER PL AND MARBLEHEAD RD) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986020 | 2024-11-21 | 2025-05-21 | Toronto Water - CSW | 5524316.0 | 4224 BLOOR ST W (Between LEAVENWORTH CRES AND PEACOCK AVE) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986019 | 2024-11-21 | 2025-05-21 | Toronto Water - CSW | 8408040.0 | 1188 KIPLING AVE (Between BYWOOD DR AND GREENING CRES) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986018 | 2024-11-06 | 2025-05-06 | Toronto Water - CSW | 1020709.0 | 12 NEWCROSS DR (Between WEST DEANE PARK DR AND ROBINGLADE DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986017 | 2024-11-06 | 2025-05-06 | Toronto Water - CSW | 8101026.0 | 197 RATHBURN RD (Intersected By RAVENSCREST DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986016 | 2024-11-06 | 2025-05-06 | Toronto Water - CSW | 8105362.0 | 185 RATHBURN RD (Between EDENWOOD DR AND RAVENSCREST DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986015 | 2024-11-06 | 2025-05-06 | Toronto Water - CSW | 1004170.0 | 38 GRASSPOINT CRES (Between TOLEDO RD AND MARKLAND DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986014 | 2024-11-06 | 2025-05-06 | Toronto Water - CSW | 5538305.0 | 9 MAPLE GATE CRT (Intersected By CHERRY POST CRES) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986013 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1000532.0 | 21 FAIRLIN DR (Between MARTIN GROVE RD AND MERVYN AVE) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986012 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1014354.0 | 141 LAUREL AVE (ET) (Between LORENE DR AND BURNHAMTHORPE RD) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986011 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 14114413.0 | 39 LAUREL AVE (ET) (Between LAUREL GT AND OREGON TRL) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986010 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 8754079.0 | 22 SHAVER AVE N (Between BLOOR ST W AND LEAGATE RD) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986009 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 9530606.0 | 97 SHAVER AVE N (Between BELGROVE DR AND NORTHAMPTON DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986008 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1021865.0 | 30 NORTHAMPTON DR (Between SHAVER AVE N AND MAYDOLPH RD) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986007 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1031540.0 | 140 SHAVER AVE N [ Description: For:134 Shaver Ave (Shaver Ave and Swan Ave) ], (Between SWAN AVE AND LORENE DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986006 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1031555.0 | 166 SHAVER AVE N (Between SWAN AVE AND LORENE DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986005 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1016628.0 | 9 MARBLEHEAD RD (Between HAWTHORNE RD AND NORTHCREST RD) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986004 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1021899.0 | 17 NORTHCREST RD (Between HAYHURST RD AND ACME CRES) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986003 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1021927.0 | 54 NORTHCREST RD [ Description: For:(103m east of 54 NORTHCREST RD)(opposite CB x 2, infront of the parking lot entrance) ], (Intersected By MARBLEHEAD RD) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986002 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 1044602.0 | 11 WINCOTT DR (Intersected By CHETTA PL) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999986001 | 2024-11-05 | 2025-05-05 | Toronto Water - CSW | 3062912.0 | 7 PRENTICE CRT (Intersected By SUN ROW DR) | PERMIT ISSUED | Chamber repair | 2.0 | Etobicoke and York | 181 |
+| 999985001 | 2024-11-05 | 2025-05-05 | Toronto Water - CSE | 336614.0 | 54 GAIETY DR (Between BURNVIEW CRES AND BURNVIEW CRES) | PERMIT ISSUED | Box and Rod repair | 21.0 | Scarborough | 181 |
+| 999982001 | 2024-11-05 | 2024-11-07 | Toronto Water WA3 | 14074055.0 | 701 CLAYSON RD [ Description: MARK A 5M RADIUS AROUND THE CATCH BASIN; IT IS LOCATED ACROSS THE STREET FROM THE DRIVEWAY AT #701 CLAYSON RD ], (Between HUXLEY RD AND BARTOR RD) | PERMIT ISSUED | Catchbasin Lead | 7.0 | Etobicoke and York | 2 |
