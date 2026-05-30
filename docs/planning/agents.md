@@ -1,156 +1,363 @@
-# Agent Architecture Plan
+# Agent responsibilities
 
-This document defines the AI agents we plan to run, where their harness logic should live, and how they should share DGX Spark inference.
+## WhatsApp / NemoClaw intake agent
 
-## Core decision
+The WhatsApp-facing agent is responsible for **information gathering only**. It should not make final category, urgency, duplicate, or scheduling decisions.
 
-Decouple agent harness/orchestration from model inference.
+Its job is to keep asking follow-up questions until the backend has enough structured information to run the 311 data pipeline.
 
-```text
-Dev server = agent/control plane
-DGX Spark  = inference/data acceleration plane
-```
-
-The agent code should live on the dev server with the frontend/backend stack. The DGX Spark should run model serving and GPU data services.
+Minimum information to extract:
 
 ```text
-Dev server
-  - WhatsApp frontend / OpenClaw or NemoClaw harness
-  - LangGraph orchestration logic
-  - HITL planning/chat agent logic
-  - backend tools
-  - SQLite
-  - Redis
-  - vector DB metadata / orchestration
-  - conversation state and approval state
-
-DGX Spark
-  - shared vLLM server for the main agent LLM
-  - embedding model service for 311 retrieval
-  - GPU vector search/index service, if available
+issue description             # free-text citizen report, required
+location raw text             # user's location phrasing, required
+observed_at                   # when the issue was observed/reported, required or backend-filled
+intersection_street_1         # preferred when user gives an intersection
+intersection_street_2         # preferred when user gives an intersection
+postal_code_or_fsa            # preferred when available
+ward                          # optional; backend may infer later if possible
+latitude / longitude          # optional; useful if frontend/map can provide it
+media_refs                    # optional image/video references
+hazard flags                  # required as explicit yes/no/unknown checks
 ```
 
-## Shared model serving plan
-
-Run one shared OpenAI-compatible vLLM endpoint on the DGX Spark for the main LLM used by all agents.
+Required hazard flags:
 
 ```text
-WhatsApp/OpenClaw or NemoClaw agent  ┐
-LangGraph low-urgency agent          ├──> DGX Spark vLLM endpoint
-HITL planning/advising chat agent    ┘
+injury
+active_danger
+blocking_road
+blocking_sidewalk
+flooding
+sewage_or_water_issue
+traffic_signal_issue
 ```
 
-This avoids loading three copies of the same model. The agents share model weights but keep separate prompts, memory, tool state, conversation state, permissions, and approval state.
+The intake agent may explain that it is collecting details for city review, but it must avoid presenting itself as the authority for final classification or urgency.
 
-Important: embeddings should still use a dedicated embedding model/service. The three agents can share one LLM, but the 311 embedding pipeline should not depend on the chat model unless forced by time.
+Minimum backend payload:
 
-## Agent types
+```json
+{
+  "source": "whatsapp",
+  "description": "There is graffiti on a stop sign near Wychwood and Tyrrel.",
+  "location": {
+    "raw_text": "Wychwood Ave and Tyrrel Ave",
+    "intersection_street_1": "Wychwood Ave",
+    "intersection_street_2": "Tyrrel Ave",
+    "postal_code_or_fsa": "M6G",
+    "ward": null,
+    "latitude": null,
+    "longitude": null
+  },
+  "observed_at": "2026-01-15T20:00:00",
+  "hazard_flags": {
+    "injury": false,
+    "active_danger": false,
+    "blocking_road": false,
+    "blocking_sidewalk": false,
+    "flooding": false,
+    "sewage_or_water_issue": false,
+    "traffic_signal_issue": false
+  },
+  "media_refs": []
+}
+```
 
-| Agent | Runtime / harness | Primary interface | Primary job | DGX usage |
-|---|---|---|---|---|
-| **WhatsApp intake agent** | OpenClaw and potentially NemoClaw/OpenShell | WhatsApp | Collect user service request details, ask clarifying questions, normalize request handoff to backend. | Calls shared vLLM through routed inference; may call embedding/search backend tools indirectly. |
-| **Low-urgency indexing/scheduling proposal agent** | LangGraph on dev server | Backend/internal workflow | Handle low-risk 311 tasks after deterministic ranking: call tools, retrieve similar records, propose rough queue insertion/scheduling. | Calls shared vLLM only for planning/explanation; retrieval uses DGX embedding/vector services. |
-| **HITL high-priority planning/advising agent** | NemoClaw/OpenShell preferred for safety, or dashboard agent harness | Web dashboard/operator chat | Help human operators reason about high-priority/high-liability requests, summarize evidence, ask for approvals, advise scheduling. | Calls shared vLLM for chat/advising over audited evidence. |
+## Backend triage pipeline
 
-## Component integration
+The backend is responsible for converting the intake payload into auditable data signals. It should:
+
+1. validate the incoming JSON;
+2. normalize fields into the backend canonical ticket schema;
+3. generate deterministic `structured_text` for embedding;
+4. call the DGX Spark embedding/search service;
+5. infer candidate 311 categories with uncertainty;
+6. retrieve similar historical records;
+7. retrieve active duplicate candidates;
+8. compute deterministic urgency and routing scores;
+9. persist the ticket, evidence, scores, and decision.
+
+The backend should not embed raw JSON directly. It should embed a stable text form such as:
 
 ```text
-WhatsApp
-  -> OpenClaw/NemoClaw agent harness on dev server
-  -> backend request tools
-  -> DGX Spark vLLM via inference route
-
-Web dashboard
-  -> HITL planning/advising agent on dev server
-  -> backend evidence/schedule tools
-  -> DGX Spark vLLM
-
-Backend scheduler/ranking
-  -> LangGraph low-urgency agent on dev server
-  -> tools: SQLite, Redis, vector search, scoring, audit logs
-  -> DGX Spark vLLM only when reasoning/explanation is needed
+Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel.
+Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G.
+Hazards: injury=false; active_danger=false; blocking_road=false; blocking_sidewalk=false; flooding=false; sewage_or_water_issue=false; traffic_signal_issue=false.
 ```
 
-## NemoClaw fit
+## Backend scheduling / reasoning agent
 
-NemoClaw is useful for sandboxed, always-on agents because it provides:
+The scheduling or reasoning agent runs **after** the backend has produced category candidates, urgency score, duplicate evidence, and routing decision.
+
+It should receive an evidence pack, not raw authority to invent scores:
+
+```json
+{
+  "ticket_id": "...",
+  "normalized_ticket": {},
+  "category_candidates": [],
+  "urgency_score": 0.22,
+  "urgency_decision": "LOW_URGENCY_SCHEDULING",
+  "duplicate_score": 0.12,
+  "nearest_historical_records": [],
+  "active_duplicate_candidates": [],
+  "score_breakdown": {},
+  "audit_refs": []
+}
+```
+
+For low-urgency tickets, it can suggest where to place the operation in the existing schedule. For high-urgency tickets, it should route to human workflow and provide evidence-backed category/division/section suggestions.
+
+# Data flow
+
+## 1. Intake
 
 ```text
-sandboxing
-egress policy
-inference routing
-messaging channel integration
-agent lifecycle management
+Citizen on WhatsApp
+  -> NemoClaw intake agent asks for missing details
+  -> frontend/agent sends minimum JSON payload to backend
 ```
 
-For WhatsApp/OpenClaw, the preferred shape is:
+The payload must include at least:
 
 ```text
-WhatsApp channel
-  -> OpenShell/NemoClaw sandbox
-  -> agent calls inference.local
-  -> OpenShell gateway routes to DGX Spark vLLM endpoint
+description
+location.raw_text
+observed_at or report timestamp
+hazard_flags
 ```
 
-This keeps the agent sandboxed while model inference runs on the Spark. Credentials and upstream model routing stay outside the sandbox.
+Intersection, FSA/postal code, ward, and lat/lon should be included whenever available because duplicate detection is only strong when location is specific.
 
-## KV cache / session state stance
-
-Do not pitch the architecture as "three agents with three KV caches." That is an implementation detail.
-
-Better framing:
+## 2. Backend validation and normalization
 
 ```text
-The three agents share one resident model on DGX Spark through vLLM. Their prompts, histories, tools, and approval states remain separate on the dev server. vLLM manages request-level KV cache and batching internally.
+incoming JSON
+  -> schema validation
+  -> required-field checks
+  -> normalize blank/unknown values
+  -> normalize timestamp
+  -> normalize location fields
+  -> canonical ticket record
 ```
 
-Each active generation has separate request context/KV state inside vLLM. If prefix caching is enabled, repeated shared prompt prefixes may be reused, but this should not be central to the product story.
+If required fields are missing, the backend should return a structured `NEEDS_MORE_INFO` response that the WhatsApp agent can use to ask a follow-up question.
 
-## Tool boundary rules
+## 3. JSON-to-text construction
 
-The LLM should not be the authority for priority, duplicate status, or schedule validity.
+The backend creates `structured_text` from the validated ticket. This text is the embedding input.
 
-Agents may:
+The historical SR2026 rows also use deterministic structured text, built from available columns:
 
 ```text
-collect and normalize request details
-call 311 embedding/search tools
-call deterministic ranking/scoring tools
-call rough scheduling/queue insertion tools
-summarize evidence
-ask for human approval
-explain decisions using audit logs
+Service request type: {service_request_type}.
+Division: {division}.
+Section: {section}.
+Status: {status}.
+Ward: {ward}.
+Postal area: {first_3_chars_of_postal_code}.
+Intersection: {intersection_street_1} and {intersection_street_2}.
 ```
 
-Agents must not:
+The raw normalized JSON is stored for audit. The structured text is embedded.
+
+## 4. Embedding indexes
+
+The pipeline should maintain three retrieval targets.
+
+### Category taxonomy index
+
+Built from unique SR2026 category triples:
 
 ```text
-invent priority scores
-invent duplicate matches
-invent permit/constraint evidence
-silently approve high-risk work
-write schedules without backend tool output
-claim global optimization without optimizer evidence
+service_request_type + division + section
 ```
 
-## Minimal implementation path
+Purpose:
 
-Build in this order:
+```text
+infer likely 311 category
+generate category confidence distribution
+suggest division/section for human reviewer or scheduler
+```
 
-1. Stand up DGX Spark vLLM OpenAI-compatible endpoint.
-2. Make a tiny dev-server client that all agents can call.
-3. Build the 311 embedding/vector-search path separately on DGX Spark.
-4. Implement backend tools for dedupe/ranking/evidence retrieval.
-5. Wire the LangGraph low-urgency agent to those tools.
-6. Wire WhatsApp/OpenClaw or NemoClaw intake to request submission.
-7. Wire dashboard/HITL chat to audited decisions and schedule proposals.
+Example embedded text:
 
-## Judging pitch
+```text
+Service request category: Road Pothole / Road Damage.
+Division: Transportation Services.
+Section: Road Operations.
+```
 
-Lead with:
+### Historical request index
 
-> The DGX Spark runs the shared local LLM, embedding service, and 311 vector index. The agent harnesses stay on the dev server where the tools, DBs, WhatsApp integration, and dashboard live. This lets multiple agents share one resident model while keeping city/citizen data local and every decision grounded in deterministic backend evidence.
+Built from all normalized historical service request rows.
 
-Do not lead with:
+Purpose:
 
-> We run three separate chatbots on the GPU.
+```text
+find similar historical incidents
+provide evidence/examples
+support category priors and workload context
+```
+
+### Active duplicate index
+
+Built from rows where:
+
+```text
+status in ["New", "In Progress"]
+```
+
+Purpose:
+
+```text
+retrieve possible active duplicates
+then apply deterministic metadata filtering before marking duplicate
+```
+
+## 5. Category inference with uncertainty
+
+```text
+incoming ticket structured_text
+  -> embed on DGX Spark
+  -> nearest-neighbor search against category taxonomy index
+  -> top K category candidates
+  -> normalize similarities into confidence weights
+```
+
+Example result:
+
+```json
+[
+  {
+    "service_request_type": "Road Pothole / Road Damage",
+    "division": "Transportation Services",
+    "section": "Road Operations",
+    "confidence": 0.57
+  },
+  {
+    "service_request_type": "Road - Sinking",
+    "division": "Transportation Services",
+    "section": "Road Operations",
+    "confidence": 0.30
+  },
+  {
+    "service_request_type": "Damaged Concrete Sidewalk",
+    "division": "Transportation Services",
+    "section": "Road Operations",
+    "confidence": 0.13
+  }
+]
+```
+
+If the top confidence is low or the margin between the first and second category is small, the backend should mark category confidence as uncertain and route to human review or request clarification.
+
+## 6. Duplicate detection
+
+Duplicate detection is hybrid:
+
+```text
+vector search finds candidates
+metadata rules decide whether duplicate evidence is strong enough
+```
+
+Strong duplicate evidence:
+
+```text
+same or highly similar inferred category
+active status: New or In Progress
+same intersection streets
+same ward or FSA
+recent report time
+high embedding similarity
+```
+
+Weak duplicate evidence:
+
+```text
+same category but only same ward
+same category but only same FSA
+no intersection/address/lat-lon
+old completed records
+```
+
+Decision outputs should distinguish:
+
+```text
+DUPLICATE
+POSSIBLE_DUPLICATE
+NOT_DUPLICATE
+```
+
+Only strong active matches should become `DUPLICATE`. Weak matches should remain evidence for review or scheduling context.
+
+## 7. Urgency scoring
+
+Urgency is not learned directly from SR2026 because the dataset has no true urgency label. It should be a transparent weighted ruleset.
+
+Inputs:
+
+```text
+category confidence distribution
+hazard flags from intake agent
+keyword/rule matches from description
+optional duplicate/workload context
+```
+
+Recommended formula:
+
+```text
+category_base_score = weighted average of urgency base scores across category candidates
+rules_score = category_base_score + hazard_boosts + keyword_boosts - penalties
+urgency_score = clamp(rules_score, 0.0, 1.0)
+```
+
+Example category uncertainty weighting:
+
+```text
+0.57 * urgency("Road Pothole / Road Damage")
++ 0.30 * urgency("Road - Sinking")
++ 0.13 * urgency("Damaged Concrete Sidewalk")
+```
+
+Suggested routing thresholds:
+
+```text
+urgency_score >= 0.75      -> HIGH_URGENCY_HUMAN_REVIEW
+0.45 <= urgency_score < .75 -> MEDIUM_REVIEW_OR_QUEUE
+urgency_score < 0.45       -> LOW_URGENCY_SCHEDULING
+```
+
+Hard route flags should override the numeric score:
+
+```text
+injury=true
+active_danger=true
+traffic_signal_issue=true
+```
+
+These should always force human review.
+
+## 8. Low-urgency scheduling handoff
+
+For low-urgency tickets:
+
+```text
+scored ticket + inferred category + duplicate evidence
+  -> scheduling/reasoning agent
+  -> compare against existing scheduled operations
+  -> suggest insertion or batching by ward/category/location tokens
+  -> persist explanation and audit evidence
+```
+
+For high-urgency tickets:
+
+```text
+scored ticket + inferred category + evidence
+  -> human workflow
+  -> show suggested service_request_type/division/section
+  -> show nearest historical and active records
+  -> do not auto-schedule
+```
