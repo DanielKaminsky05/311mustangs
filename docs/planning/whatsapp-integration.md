@@ -17,6 +17,69 @@ pipeline** authority. Where they overlap, `whatsapp-api.md` wins.
 
 ---
 
+## Hackathon MVP scope
+
+> **Judging check (from `spark-usage.md` / `criteria.md`):** the hackathon scores the
+> **DGX Spark / NVIDIA stack** — RAPIDS/cuDF, NIM/NeMo embeddings, cuVS/FAISS-GPU vector
+> search, optional local NVIDIA LLM — **not** the NemoClaw sandbox. The WhatsApp agent is
+> explicitly "an operator copilot, not the main DGX story." → **NemoClaw sandboxing (risks
+> A1/A2) is NOT required for the MVP.** Run the OpenClaw agent as a plain process with the
+> Twilio creds in env; add the sandbox later only if you want the extra hardening.
+
+The MVP goal is "the loop works end-to-end live." Only a few of the risks below apply:
+
+**MUST (loop breaks, or starves the pipeline, without these):**
+- **A3 (partial) — fast Twilio ack.** Return `200` to Twilio immediately, do the work after,
+  reply via REST API — or LLM/embedding latency trips Twilio's ~15s timeout → duplicate
+  replies on stage. *The agent→backend leg can stay fully synchronous; the `202`-async
+  pipeline is NOT needed for the MVP.*
+- **A5 (state, not race) — per-sender conversation state.** One in-memory dict keyed by
+  sender. Skip the locking; testers message sequentially.
+- **A10 — follow-up loop exit.** Cap at ~3 follow-ups then "I'll file with what I have," or
+  it can loop forever on stage.
+- **Collect the required pipeline inputs, not just description.** The pipeline needs more
+  than free text:
+  - **`safety_answers` (all 7 keys, `yes`/`no`/`unknown`)** — a *required* contract field
+    (no `201` without it) **and** the only input to urgency scoring + the injury /
+    active-danger / traffic-signal hard routes. Defaulting to `unknown` is allowed to keep
+    the loop short, but ask the relevant ones if you want urgency/routing to look alive.
+  - **A specific location (intersection or FSA), not vague `raw_text`.** Duplicate detection
+    is only strong when location is specific (`agents.md`), so the follow-up loop should push
+    for an intersection/address/postal area rather than accept "near the park."
+
+**SHOULD (cheap, likely to surface while demoing):**
+- **A9 — confirm-before-submit recap** (looks smart, hides bad extractions).
+- **A6 (partial) — don't crash on non-text** (voice/sticker → "please send text or a
+  photo"); capturing a WhatsApp location pin's lat/long is a cheap bonus. Skip real STT.
+- **A23 (partial) — a tiny simulate-a-message harness + short replies** (never dump the
+  evidence pack).
+
+**SKIP (production-only — listed below, not built for the MVP):**
+- **A1, A2** — sandbox creds/egress (not running the sandbox).
+- **A4** — full idempotency (fast-ack covers most double-fires).
+- **A14, A16, A17** — injection / rate-limit / signature-behind-tunnel (fine to disable
+  Twilio signature validation in dev).
+- **A7, A8, A11, A12, A13, A15, A18, A19, A20, A21, A22, A24** — single process, English,
+  one clean report per chat, don't restart mid-demo.
+
+DGX caveat: the live path still calls DGX `embed_request` + `search_311_index` (that *is* the
+judged Spark story), so A3's latency is real — but it's absorbed by the fast Twilio ack, since
+the agent→backend leg isn't time-boxed by Twilio.
+
+**Is this loop good enough for the pipeline?** For the centerpiece judged story — submit a
+request → DGX embed + vector search → nearest historical 311 records → category/duplicate
+decision — **yes**, as long as the loop collects `description`, a specific location, and the
+`safety_answers` (see MUST above). Two notes:
+- **Skipping media (A8) costs the pipeline nothing** — category/duplicate/urgency are
+  **text-only**; images never feed them, so "no photo handling" is free.
+- **Two duplicate-demo shapes, different needs.** Dedup *against the historical 190k corpus*
+  (submit something similar to a past record) needs **zero persistence**. "Two citizens
+  report the same pothole, second is deduped" needs accepted live tickets added to the active
+  index mid-session — a slice of A18 that's otherwise skipped. Pick the historical-dedup demo
+  to stay lean.
+
+---
+
 ## The architecture is three layers, not one
 
 The earlier draft of this doc incorrectly collapsed the conversation loop into the
