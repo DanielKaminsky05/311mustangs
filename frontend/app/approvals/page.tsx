@@ -1,5 +1,6 @@
 import { getApprovalsQueue } from "../_server/data";
 import { Panel, PageHeader } from "../_components/Panel";
+import { PageUtilityButtons } from "../_components/PageUtilityButtons";
 import { Breadcrumbs } from "../_components/Breadcrumbs";
 import { DecisionChip, HardRouteBadge } from "../_components/DecisionChip";
 import { EmptyState } from "../_components/EmptyState";
@@ -15,6 +16,7 @@ export default async function ApprovalsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         crumbs={<Breadcrumbs items={[{ label: "Approvals" }]} />}
+        actions={<PageUtilityButtons />}
         title="Approvals queue"
         intro="Items the system flagged for an operator: hard-routes, medium-urgency requests, and uncertain categories. Approving never overrides the backend score; it confirms the route the pipeline already produced."
       />

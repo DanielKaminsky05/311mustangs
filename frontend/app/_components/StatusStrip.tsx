@@ -1,4 +1,4 @@
-import { Cpu, Database, Zap, ShieldCheck, Clock } from "lucide-react";
+import { Cpu, Database, Zap, ShieldCheck, Clock, Bot } from "lucide-react";
 import { getPipelineMetrics } from "../_server/data";
 
 function Pill({
@@ -46,7 +46,14 @@ export async function StatusStrip() {
         <Pill ariaLabel="Embedding model">
           <Zap size={14} className="text-ink-faint" aria-hidden />
           <span>
-            Embed: {m.embedding_backend} {m.embedding_model}
+            Embed: {m.embedding_backend} · {m.embedding_model}
+          </span>
+        </Pill>
+        <Pill ariaLabel="LLM runtime">
+          <Bot size={14} className="text-ink-faint" aria-hidden />
+          <span>
+            LLM: {m.llm_runtime} · {m.llm_intake_model} ·{" "}
+            {m.llm_reasoning_model}
           </span>
         </Pill>
         <Pill ariaLabel="Vector backend">

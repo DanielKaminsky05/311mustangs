@@ -73,7 +73,7 @@ h1,
 h2,
 h3 {
   font-weight: 500; /* Toronto.ca signature: medium-weight headings, never bold */
-  color: var(--color-civic-blue);
+  color: var(--color-ink); /* Toronto page H1s are pure black, not brand blue */
   letter-spacing: -0.01em;
 }
 

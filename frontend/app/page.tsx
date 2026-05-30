@@ -1,10 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   getApprovalsQueue,
   getEvidencePacks,
   getRecentTickets,
 } from "./_server/data";
 import { Panel, PageHeader } from "./_components/Panel";
+import { PageUtilityButtons } from "./_components/PageUtilityButtons";
 import { DataTable, type Column } from "./_components/DataTable";
 import { DecisionChip, HardRouteBadge } from "./_components/DecisionChip";
 import { EmptyState } from "./_components/EmptyState";
@@ -115,6 +117,20 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Operator dashboard"
+        actions={<PageUtilityButtons />}
+        hero={
+          <div className="overflow-hidden rounded-[3px] border border-border">
+            <Image
+              src="/toronto-hero.jpg"
+              alt="Nathan Phillips Square with the Toronto sign"
+              width={1680}
+              height={440}
+              priority
+              className="w-full h-auto block"
+              sizes="(min-width: 1280px) 1280px, 100vw"
+            />
+          </div>
+        }
         intro="Recent triage decisions and the queue of items needing human action. Every score and decision shown on this surface is computed in the backend; the agent explains, it never decides."
       />
 

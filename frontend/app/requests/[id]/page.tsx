@@ -8,6 +8,7 @@ import {
   getTicket,
 } from "../../_server/data";
 import { Panel, PageHeader } from "../../_components/Panel";
+import { PageUtilityButtons } from "../../_components/PageUtilityButtons";
 import { Breadcrumbs } from "../../_components/Breadcrumbs";
 import { SectionSidebar } from "../../_components/SectionSidebar";
 import { DefinitionList } from "../../_components/DefinitionList";
@@ -65,6 +66,7 @@ export default async function TriagePage(props: {
             ]}
           />
         }
+        actions={<PageUtilityButtons />}
         title={
           <>
             Request{" "}

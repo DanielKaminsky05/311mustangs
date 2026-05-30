@@ -1,5 +1,6 @@
 import { getOperations, getScheduleAssignments } from "../_server/data";
 import { Panel, PageHeader } from "../_components/Panel";
+import { PageUtilityButtons } from "../_components/PageUtilityButtons";
 import { Breadcrumbs } from "../_components/Breadcrumbs";
 import { DataTable, type Column } from "../_components/DataTable";
 import { EmptyState } from "../_components/EmptyState";
@@ -106,6 +107,7 @@ export default async function SchedulePage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         crumbs={<Breadcrumbs items={[{ label: "Schedule" }]} />}
+        actions={<PageUtilityButtons />}
         title="Schedule"
         intro="Active operations and the ranked queue of low-urgency tickets the scheduling agent has proposed inserting. The agent batches by ward, service_request_type, and intersection — its proposals show up here before an operator approves them."
       />

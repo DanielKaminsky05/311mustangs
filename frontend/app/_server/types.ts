@@ -142,6 +142,9 @@ export type PipelineMetrics = {
   rapids_cudf_version: string;
   embedding_backend: string;
   embedding_model: string;
+  llm_runtime: string;
+  llm_intake_model: string;
+  llm_reasoning_model: string;
   vector_backend: string;
   records_indexed: number;
   active_records: number;

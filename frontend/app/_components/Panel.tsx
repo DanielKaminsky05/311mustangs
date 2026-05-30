@@ -29,7 +29,7 @@ export function Panel({
         <header className="flex items-end justify-between gap-3 px-5 pt-4 pb-3 border-b border-border">
           <div>
             {title && (
-              <h2 className="text-lg leading-tight font-medium text-civic-blue tracking-tight">
+              <h2 className="text-lg leading-tight font-medium text-ink tracking-tight">
                 {title}
               </h2>
             )}
@@ -51,19 +51,29 @@ export function PageHeader({
   title,
   intro,
   crumbs,
+  actions,
+  hero,
 }: {
   title: ReactNode;
   intro?: ReactNode;
   crumbs?: ReactNode;
+  actions?: ReactNode;
+  hero?: ReactNode;
 }) {
   return (
-    <header className="border-b border-border pb-4 mb-6">
+    <header className="mb-6">
       {crumbs}
-      <h1 className="text-3xl sm:text-[36px] leading-[1.15] font-medium text-civic-blue tracking-tight">
-        {title}
-      </h1>
+      <div className="flex items-start justify-between gap-4 flex-wrap pb-4 border-b border-border">
+        <h1 className="text-3xl sm:text-[36px] leading-[1.15] font-medium text-ink tracking-tight m-0">
+          {title}
+        </h1>
+        {actions && (
+          <div className="shrink-0 mt-2 sm:mt-1">{actions}</div>
+        )}
+      </div>
+      {hero && <div className="mt-4">{hero}</div>}
       {intro && (
-        <p className="mt-3 text-base text-ink max-w-prose">{intro}</p>
+        <p className="mt-4 text-base text-ink max-w-prose">{intro}</p>
       )}
     </header>
   );
