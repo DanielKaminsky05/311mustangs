@@ -11,7 +11,8 @@ Components:
 - `whatsapp-api.md` — WhatsApp/backend intake contract plus data pipeline correspondence and vector embedding pipeline for one-time artifacts and live inference. Includes implementation plan.
 - `criteria.md` — judging rubric excerpts used to prioritize work.
 - `nvidia-suggestion.md` — archived suggestion notes (reference-only).
-- `nemoclaw.md` / `nemoclaw-arch.md` — NemoClaw-focused concept notes.
+- `nemoclaw.md` / `nemoclaw-arch.md` / `text.md` — NemoClaw-focused concept notes.
+- `spark-env.md` — DGX Spark (GX10) Python environment layout, per-venv install/update runbook, and Docker/NemoClaw notes.
 
 Related Indexes:
 - `../INDEX.md` - top-level docs navigation
