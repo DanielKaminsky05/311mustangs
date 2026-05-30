@@ -1,0 +1,42 @@
+[
+  {
+    "operation_id": "op-001",
+    "category": "Graffiti",
+    "ward": "Toronto-St. Paul's (12)",
+    "intersection": "Wychwood Ave / Tyrrel Ave",
+    "status": "scheduled",
+    "scheduled_for": "2026-01-17T10:00:00"
+  },
+  {
+    "operation_id": "op-002",
+    "category": "Road Pothole / Road Damage",
+    "ward": "Eglinton-Lawrence (8)",
+    "intersection": "Yonge St / Eglinton Ave E",
+    "status": "in_progress",
+    "scheduled_for": "2026-01-16T08:00:00"
+  },
+  {
+    "operation_id": "op-003",
+    "category": "Clean up Debris on Road",
+    "ward": "Toronto-St. Paul's (12)",
+    "intersection": "St. Clair Ave W / Christie St",
+    "status": "scheduled",
+    "scheduled_for": "2026-01-17T11:30:00"
+  },
+  {
+    "operation_id": "op-004",
+    "category": "Damaged Concrete Sidewalk",
+    "ward": "Davenport (9)",
+    "intersection": "Dufferin St / Bloor St W",
+    "status": "scheduled",
+    "scheduled_for": "2026-01-18T09:00:00"
+  },
+  {
+    "operation_id": "op-005",
+    "category": "Graffiti",
+    "ward": "University-Rosedale (11)",
+    "intersection": "Bloor St W / Bathurst St",
+    "status": "completed",
+    "scheduled_for": "2026-01-14T13:00:00"
+  }
+]

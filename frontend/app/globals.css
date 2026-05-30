@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Toronto.ca civic palette — captured from live site computed styles */
+  --color-civic-blue: #165788;
+  --color-civic-blue-deep: #0f4a75;
+  --color-civic-blue-dark: #0a3b60;
+  --color-civic-blue-soft: #e4ecf2;
+  --color-civic-amber: #ec9f09;
+  --color-civic-amber-hover: #d18d05;
+
+  --color-ink: #000000;
+  --color-ink-muted: #333333;
+  --color-ink-faint: #6b6b6b;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8f8f8;
+  --color-border: #dddddd;
+  --color-border-strong: #bfbfbf;
+
+  --color-decision-ok: #1f7a45;
+  --color-decision-warn: #b8590a;
+  --color-decision-stop: #b0263c;
+  --color-decision-neutral: #4a5763;
+  --color-accent-spark: #76b900;
+
+  /* Resolved font stacks. The next/font CSS variables (--font-text /
+   * --font-display / --font-mono) are injected by Next on <html>; these
+   * `--font-stack-*` aliases bake in fallbacks so a single var() lookup
+   * always resolves to a usable family, even before the webfont arrives. */
+  --font-stack-text: var(--font-text), Roboto, "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  --font-stack-display: var(--font-display), var(--font-text), Roboto,
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-stack-mono: var(--font-mono), ui-monospace, "SF Mono", Menlo,
+    Consolas, monospace;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-civic-blue: var(--color-civic-blue);
+  --color-civic-blue-deep: var(--color-civic-blue-deep);
+  --color-civic-blue-dark: var(--color-civic-blue-dark);
+  --color-civic-blue-soft: var(--color-civic-blue-soft);
+  --color-civic-amber: var(--color-civic-amber);
+  --color-civic-amber-hover: var(--color-civic-amber-hover);
+
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-ink-faint: var(--color-ink-faint);
+  --color-surface: var(--color-surface);
+  --color-surface-alt: var(--color-surface-alt);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-decision-ok: var(--color-decision-ok);
+  --color-decision-warn: var(--color-decision-warn);
+  --color-decision-stop: var(--color-decision-stop);
+  --color-decision-neutral: var(--color-decision-neutral);
+  --color-accent-spark: var(--color-accent-spark);
+
+  /* Tailwind v4 font utilities — anchor them on the resolved stacks so the
+   * `font-display` / `font-mono` classes always produce a real family. */
+  --font-text: var(--font-stack-text);
+  --font-display: var(--font-stack-display);
+  --font-mono: var(--font-stack-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-stack-text);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+a {
+  color: var(--color-civic-blue);
+  /* No global underline — text links opt in via Tailwind `underline`. Chrome
+   * links (nav rail, brand wordmark, decision chips) stay clean by default
+   * instead of fighting `no-underline` overrides. */
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--color-civic-blue-deep);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 500; /* Toronto.ca signature: medium-weight headings, never bold */
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+}
+
+.font-brand {
+  /* Display-weight family for the TORONTO wordmark — explicit so the
+   * brand bar never falls back to a thin system font on slow loads. */
+  font-family: var(--font-stack-display);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-civic-blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--color-civic-blue-soft);
+  color: var(--color-civic-blue-deep);
 }

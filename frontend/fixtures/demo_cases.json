@@ -1,0 +1,122 @@
+[
+  {
+    "case_id": "demo-graffiti-possible-dup",
+    "title": "Graffiti at Wychwood/Tyrrel — POSSIBLE_DUPLICATE / LOW_URGENCY",
+    "blurb": "Citizen reports graffiti on a stop sign; the system finds a similar active record at the same intersection. Demonstrates the dedupe + scheduling path.",
+    "intake_payload": {
+      "source": "demo",
+      "description": "There is graffiti on a stop sign near Wychwood and Tyrrel.",
+      "location": {
+        "raw_text": "Wychwood Ave and Tyrrel Ave",
+        "intersection_street_1": "Wychwood Ave",
+        "intersection_street_2": "Tyrrel Ave",
+        "postal_code_or_fsa": "M6G",
+        "ward": "Toronto-St. Paul's (12)",
+        "latitude": null,
+        "longitude": null
+      },
+      "observed_at": "2026-01-15T19:48:00",
+      "safety_answers": {
+        "injury": "no",
+        "active_danger": "no",
+        "blocking_road": "no",
+        "blocking_sidewalk": "no",
+        "flooding": "no",
+        "sewage_or_water_issue": "no",
+        "traffic_signal_issue": "no"
+      },
+      "media_refs": [],
+      "metadata": {}
+    }
+  },
+  {
+    "case_id": "demo-traffic-signal-hard-route",
+    "title": "Traffic signal dark — HARD-ROUTE / HIGH_URGENCY",
+    "blurb": "Dark traffic signal at a major intersection. Two hard-route flags fire (traffic_signal_issue + active_danger) and force human review regardless of numeric score.",
+    "intake_payload": {
+      "source": "demo",
+      "description": "Traffic light is dark at Bloor and Spadina. Cars are treating it as a 4-way stop but it's not safe.",
+      "location": {
+        "raw_text": "Bloor St W and Spadina Ave",
+        "intersection_street_1": "Bloor St W",
+        "intersection_street_2": "Spadina Ave",
+        "postal_code_or_fsa": "M5R",
+        "ward": "University-Rosedale (11)",
+        "latitude": null,
+        "longitude": null
+      },
+      "observed_at": "2026-01-15T19:55:00",
+      "safety_answers": {
+        "injury": "no",
+        "active_danger": "yes",
+        "blocking_road": "no",
+        "blocking_sidewalk": "no",
+        "flooding": "no",
+        "sewage_or_water_issue": "no",
+        "traffic_signal_issue": "yes"
+      },
+      "media_refs": [],
+      "metadata": {}
+    }
+  },
+  {
+    "case_id": "demo-pothole-blocking",
+    "title": "Pothole blocking lane — MEDIUM",
+    "blurb": "Pothole blocking a lane on Yonge. blocking_road=yes gives a hazard boost but no hard route; routes to operator queue.",
+    "intake_payload": {
+      "source": "demo",
+      "description": "Large pothole on Yonge just south of Eglinton, taking up the right lane. Cars are swerving around it.",
+      "location": {
+        "raw_text": "Yonge St near Eglinton",
+        "intersection_street_1": "Yonge St",
+        "intersection_street_2": "Eglinton Ave E",
+        "postal_code_or_fsa": "M4P",
+        "ward": "Eglinton-Lawrence (8)",
+        "latitude": null,
+        "longitude": null
+      },
+      "observed_at": "2026-01-15T18:22:00",
+      "safety_answers": {
+        "injury": "no",
+        "active_danger": "no",
+        "blocking_road": "yes",
+        "blocking_sidewalk": "no",
+        "flooding": "no",
+        "sewage_or_water_issue": "no",
+        "traffic_signal_issue": "no"
+      },
+      "media_refs": [],
+      "metadata": {}
+    }
+  },
+  {
+    "case_id": "demo-vague-uncertain",
+    "title": "Vague description — UNCERTAIN_CATEGORY",
+    "blurb": "Ambiguous report. Category confidence falls below threshold; some safety answers remain 'unknown' because the agent couldn't get a clear answer. Routes to a human for confirmation, not auto-schedule.",
+    "intake_payload": {
+      "source": "demo",
+      "description": "Something weird is going on with the road, hard to describe — looks broken near the curb.",
+      "location": {
+        "raw_text": "near Dufferin and Bloor",
+        "intersection_street_1": "Dufferin St",
+        "intersection_street_2": "Bloor St W",
+        "postal_code_or_fsa": "M6H",
+        "ward": "Davenport (9)",
+        "latitude": null,
+        "longitude": null
+      },
+      "observed_at": "2026-01-15T19:10:00",
+      "safety_answers": {
+        "injury": "no",
+        "active_danger": "unknown",
+        "blocking_road": "unknown",
+        "blocking_sidewalk": "no",
+        "flooding": "no",
+        "sewage_or_water_issue": "no",
+        "traffic_signal_issue": "no"
+      },
+      "media_refs": [],
+      "metadata": {}
+    }
+  }
+]

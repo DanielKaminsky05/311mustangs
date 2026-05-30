@@ -1,0 +1,414 @@
+[
+  {
+    "ticket_id": "tkt-001",
+    "category_candidates": [
+      {
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "similarity": 0.84,
+        "confidence": 0.62
+      },
+      {
+        "service_request_type": "Damaged Sign",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.71,
+        "confidence": 0.24
+      },
+      {
+        "service_request_type": "Vandalism (Other)",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "similarity": 0.58,
+        "confidence": 0.14
+      }
+    ],
+    "category_confidence": 0.62,
+    "category_margin": 0.38,
+    "category_decision": "SUGGESTED_CATEGORY",
+    "nearest_historical_records": [
+      {
+        "record_id": "sr2026-018241",
+        "similarity": 0.87,
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "ward": "Toronto-St. Paul's (12)",
+        "intersection_street_1": "Wychwood Ave",
+        "intersection_street_2": "St Clair Ave W",
+        "status": "Completed",
+        "creation_date": "2025-11-04",
+        "structured_text": "Service request type: Graffiti. Division: Municipal Licensing & Standards. Section: Investigation Services. Status: Completed. Ward: Toronto-St. Paul's (12). Intersection: Wychwood Ave and St Clair Ave W."
+      },
+      {
+        "record_id": "sr2026-022914",
+        "similarity": 0.79,
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "ward": "Toronto-St. Paul's (12)",
+        "intersection_street_1": "Christie St",
+        "intersection_street_2": "Tyrrel Ave",
+        "status": "Completed",
+        "creation_date": "2025-12-19",
+        "structured_text": "Service request type: Graffiti. Division: Municipal Licensing & Standards. Section: Investigation Services. Status: Completed. Ward: Toronto-St. Paul's (12). Intersection: Christie St and Tyrrel Ave."
+      }
+    ],
+    "active_duplicate_candidates": [
+      {
+        "record_id": "sr2026-024108",
+        "similarity": 0.91,
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "ward": "Toronto-St. Paul's (12)",
+        "intersection_street_1": "Wychwood Ave",
+        "intersection_street_2": "Tyrrel Ave",
+        "status": "In Progress",
+        "creation_date": "2026-01-10",
+        "structured_text": "Service request type: Graffiti. Division: Municipal Licensing & Standards. Section: Investigation Services. Status: In Progress. Ward: Toronto-St. Paul's (12). Intersection: Wychwood Ave and Tyrrel Ave.",
+        "filter_match": ["same intersection", "same category", "active"]
+      }
+    ],
+    "duplicate_decision": "POSSIBLE_DUPLICATE",
+    "duplicate_score": 0.74,
+    "urgency_score": 0.18,
+    "urgency_decision": "LOW_URGENCY_SCHEDULING",
+    "score_breakdown": {
+      "category_base_score": 0.15,
+      "hazard_boost_total": 0.0,
+      "keyword_boost_total": 0.05,
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
+    },
+    "route": "SCHEDULING_AGENT",
+    "audit_refs": ["aud-001", "aud-002", "aud-003", "aud-004"],
+    "category_query_text": "Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "retrieval_query_text": "Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel. Inferred category candidates: Graffiti; Damaged Sign; Vandalism (Other). Division candidates: Municipal Licensing & Standards; Transportation Services. Section candidates: Investigation Services; Road Operations. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:b1c7e2…"
+    }
+  },
+  {
+    "ticket_id": "tkt-002",
+    "category_candidates": [
+      {
+        "service_request_type": "Road Pothole / Road Damage",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.89,
+        "confidence": 0.71
+      },
+      {
+        "service_request_type": "Road - Sinking",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.74,
+        "confidence": 0.19
+      },
+      {
+        "service_request_type": "Damaged Concrete Sidewalk",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.61,
+        "confidence": 0.10
+      }
+    ],
+    "category_confidence": 0.71,
+    "category_margin": 0.52,
+    "category_decision": "SUGGESTED_CATEGORY",
+    "nearest_historical_records": [
+      {
+        "record_id": "sr2026-031224",
+        "similarity": 0.85,
+        "service_request_type": "Road Pothole / Road Damage",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "ward": "Eglinton-Lawrence (8)",
+        "intersection_street_1": "Yonge St",
+        "intersection_street_2": "Erskine Ave",
+        "status": "Completed",
+        "creation_date": "2025-12-02",
+        "structured_text": "Service request type: Road Pothole / Road Damage. Division: Transportation Services. Section: Road Operations. Status: Completed. Ward: Eglinton-Lawrence (8). Intersection: Yonge St and Erskine Ave."
+      }
+    ],
+    "active_duplicate_candidates": [],
+    "duplicate_decision": "NOT_DUPLICATE",
+    "duplicate_score": 0.12,
+    "urgency_score": 0.58,
+    "urgency_decision": "MEDIUM_REVIEW_OR_QUEUE",
+    "score_breakdown": {
+      "category_base_score": 0.32,
+      "hazard_boost_total": 0.22,
+      "keyword_boost_total": 0.06,
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
+    },
+    "route": "HUMAN_WORKFLOW",
+    "audit_refs": ["aud-005", "aud-006", "aud-007"],
+    "category_query_text": "Reported issue: Large pothole on Yonge just south of Eglinton, taking up the right lane. Location: Yonge St and Eglinton Ave E. Postal area: M4P. Safety signals reported: blocking_road=yes.",
+    "retrieval_query_text": "Reported issue: Large pothole on Yonge just south of Eglinton, taking up the right lane. Inferred category candidates: Road Pothole / Road Damage; Road - Sinking; Damaged Concrete Sidewalk. Division candidates: Transportation Services. Section candidates: Road Operations. Location: Yonge St and Eglinton Ave E. Postal area: M4P. Safety signals reported: blocking_road=yes.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:9a3d80…"
+    }
+  },
+  {
+    "ticket_id": "tkt-003",
+    "category_candidates": [
+      {
+        "service_request_type": "Traffic Signal Issue",
+        "division": "Transportation Services",
+        "section": "Traffic Control",
+        "similarity": 0.92,
+        "confidence": 0.78
+      },
+      {
+        "service_request_type": "Street Light Out",
+        "division": "Transportation Services",
+        "section": "Traffic Control",
+        "similarity": 0.69,
+        "confidence": 0.14
+      }
+    ],
+    "category_confidence": 0.78,
+    "category_margin": 0.64,
+    "category_decision": "SUGGESTED_CATEGORY",
+    "nearest_historical_records": [
+      {
+        "record_id": "sr2026-009812",
+        "similarity": 0.81,
+        "service_request_type": "Traffic Signal Issue",
+        "division": "Transportation Services",
+        "section": "Traffic Control",
+        "ward": "Spadina-Fort York (10)",
+        "intersection_street_1": "Bloor St W",
+        "intersection_street_2": "Bathurst St",
+        "status": "Completed",
+        "creation_date": "2025-10-21",
+        "structured_text": "Service request type: Traffic Signal Issue. Division: Transportation Services. Section: Traffic Control. Status: Completed. Ward: Spadina-Fort York (10). Intersection: Bloor St W and Bathurst St."
+      }
+    ],
+    "active_duplicate_candidates": [],
+    "duplicate_decision": "NOT_DUPLICATE",
+    "duplicate_score": 0.08,
+    "urgency_score": 0.94,
+    "urgency_decision": "HIGH_URGENCY_HUMAN_REVIEW",
+    "score_breakdown": {
+      "category_base_score": 0.48,
+      "hazard_boost_total": 0.50,
+      "keyword_boost_total": 0.04,
+      "penalty_total": 0.08,
+      "hard_routes_triggered": ["active_danger", "traffic_signal_issue"]
+    },
+    "route": "HUMAN_WORKFLOW",
+    "audit_refs": ["aud-008", "aud-009", "aud-010"],
+    "category_query_text": "Reported issue: Traffic light is dark at Bloor and Spadina. Location: Bloor St W and Spadina Ave. Postal area: M5R. Safety signals reported: active_danger=yes; traffic_signal_issue=yes.",
+    "retrieval_query_text": "Reported issue: Traffic light is dark at Bloor and Spadina. Inferred category candidates: Traffic Signal Issue; Street Light Out. Division candidates: Transportation Services. Section candidates: Traffic Control. Location: Bloor St W and Spadina Ave. Postal area: M5R. Safety signals reported: active_danger=yes; traffic_signal_issue=yes.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:f02211…"
+    }
+  },
+  {
+    "ticket_id": "tkt-004",
+    "category_candidates": [
+      {
+        "service_request_type": "Flooded Basement",
+        "division": "Toronto Water",
+        "section": "District Operations",
+        "similarity": 0.91,
+        "confidence": 0.74
+      },
+      {
+        "service_request_type": "Sewer Backup",
+        "division": "Toronto Water",
+        "section": "District Operations",
+        "similarity": 0.83,
+        "confidence": 0.19
+      }
+    ],
+    "category_confidence": 0.74,
+    "category_margin": 0.55,
+    "category_decision": "SUGGESTED_CATEGORY",
+    "nearest_historical_records": [
+      {
+        "record_id": "sr2026-014501",
+        "similarity": 0.79,
+        "service_request_type": "Flooded Basement",
+        "division": "Toronto Water",
+        "section": "District Operations",
+        "ward": "Toronto-Danforth (14)",
+        "intersection_street_1": "Pape Ave",
+        "intersection_street_2": "Gerrard St E",
+        "status": "Completed",
+        "creation_date": "2025-09-30",
+        "structured_text": "Service request type: Flooded Basement. Division: Toronto Water. Section: District Operations. Status: Completed. Ward: Toronto-Danforth (14). Intersection: Pape Ave and Gerrard St E."
+      }
+    ],
+    "active_duplicate_candidates": [],
+    "duplicate_decision": "NOT_DUPLICATE",
+    "duplicate_score": 0.10,
+    "urgency_score": 0.82,
+    "urgency_decision": "HIGH_URGENCY_HUMAN_REVIEW",
+    "score_breakdown": {
+      "category_base_score": 0.41,
+      "hazard_boost_total": 0.36,
+      "keyword_boost_total": 0.08,
+      "penalty_total": 0.03,
+      "hard_routes_triggered": []
+    },
+    "route": "HUMAN_WORKFLOW",
+    "audit_refs": ["aud-011", "aud-012", "aud-013"],
+    "category_query_text": "Reported issue: Basement is flooding, smells like sewage. Location: Pape Ave and Danforth Ave. Postal area: M4K. Safety signals reported: flooding=yes; sewage_or_water_issue=yes.",
+    "retrieval_query_text": "Reported issue: Basement is flooding, smells like sewage. Inferred category candidates: Flooded Basement; Sewer Backup. Division candidates: Toronto Water. Section candidates: District Operations. Location: Pape Ave and Danforth Ave. Postal area: M4K. Safety signals reported: flooding=yes; sewage_or_water_issue=yes.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:7c441e…"
+    }
+  },
+  {
+    "ticket_id": "tkt-005",
+    "category_candidates": [
+      {
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "similarity": 0.88,
+        "confidence": 0.66
+      },
+      {
+        "service_request_type": "Damaged Sign",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.70,
+        "confidence": 0.20
+      }
+    ],
+    "category_confidence": 0.66,
+    "category_margin": 0.46,
+    "category_decision": "SUGGESTED_CATEGORY",
+    "nearest_historical_records": [
+      {
+        "record_id": "sr2026-018241",
+        "similarity": 0.86,
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "ward": "Toronto-St. Paul's (12)",
+        "intersection_street_1": "Wychwood Ave",
+        "intersection_street_2": "St Clair Ave W",
+        "status": "Completed",
+        "creation_date": "2025-11-04",
+        "structured_text": "Service request type: Graffiti. Division: Municipal Licensing & Standards. Section: Investigation Services. Status: Completed. Ward: Toronto-St. Paul's (12). Intersection: Wychwood Ave and St Clair Ave W."
+      }
+    ],
+    "active_duplicate_candidates": [
+      {
+        "record_id": "tkt-001",
+        "similarity": 0.96,
+        "service_request_type": "Graffiti",
+        "division": "Municipal Licensing & Standards",
+        "section": "Investigation Services",
+        "ward": "Toronto-St. Paul's (12)",
+        "intersection_street_1": "Wychwood Ave",
+        "intersection_street_2": "Tyrrel Ave",
+        "status": "In Progress",
+        "creation_date": "2026-01-15",
+        "structured_text": "Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G.",
+        "filter_match": ["same intersection", "same category", "active", "reported < 1h ago"]
+      }
+    ],
+    "duplicate_decision": "DUPLICATE",
+    "duplicate_score": 0.93,
+    "urgency_score": 0.18,
+    "urgency_decision": "LOW_URGENCY_SCHEDULING",
+    "score_breakdown": {
+      "category_base_score": 0.15,
+      "hazard_boost_total": 0.0,
+      "keyword_boost_total": 0.05,
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
+    },
+    "route": "DUPLICATE_WORKFLOW",
+    "audit_refs": ["aud-014", "aud-015"],
+    "category_query_text": "Reported issue: Still graffiti on the stop sign at Wychwood and Tyrrel. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "retrieval_query_text": "Reported issue: Still graffiti on the stop sign at Wychwood and Tyrrel. Inferred category candidates: Graffiti; Damaged Sign. Division candidates: Municipal Licensing & Standards; Transportation Services. Section candidates: Investigation Services; Road Operations. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:b1c7e2…"
+    }
+  },
+  {
+    "ticket_id": "tkt-006",
+    "category_candidates": [
+      {
+        "service_request_type": "Damaged Concrete Sidewalk",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.62,
+        "confidence": 0.41
+      },
+      {
+        "service_request_type": "Road Pothole / Road Damage",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.58,
+        "confidence": 0.36
+      },
+      {
+        "service_request_type": "Clean up Debris on Road",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "similarity": 0.51,
+        "confidence": 0.23
+      }
+    ],
+    "category_confidence": 0.41,
+    "category_margin": 0.05,
+    "category_decision": "UNCERTAIN_CATEGORY",
+    "nearest_historical_records": [
+      {
+        "record_id": "sr2026-027431",
+        "similarity": 0.63,
+        "service_request_type": "Damaged Concrete Sidewalk",
+        "division": "Transportation Services",
+        "section": "Road Operations",
+        "ward": "Davenport (9)",
+        "intersection_street_1": "Dufferin St",
+        "intersection_street_2": "Hallam St",
+        "status": "Completed",
+        "creation_date": "2025-08-18",
+        "structured_text": "Service request type: Damaged Concrete Sidewalk. Division: Transportation Services. Section: Road Operations. Status: Completed. Ward: Davenport (9). Intersection: Dufferin St and Hallam St."
+      }
+    ],
+    "active_duplicate_candidates": [],
+    "duplicate_decision": "NOT_DUPLICATE",
+    "duplicate_score": 0.18,
+    "urgency_score": 0.21,
+    "urgency_decision": "LOW_URGENCY_SCHEDULING",
+    "score_breakdown": {
+      "category_base_score": 0.16,
+      "hazard_boost_total": 0.0,
+      "keyword_boost_total": 0.07,
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
+    },
+    "route": "HUMAN_WORKFLOW",
+    "audit_refs": ["aud-016", "aud-017"],
+    "category_query_text": "Reported issue: Something weird is going on with the road, hard to describe — looks broken near the curb. Location: Dufferin St and Bloor St W. Postal area: M6H. Safety signals reported: active_danger=unknown; blocking_road=unknown.",
+    "retrieval_query_text": "Reported issue: Something weird is going on with the road, hard to describe — looks broken near the curb. Inferred category candidates: Damaged Concrete Sidewalk; Road Pothole / Road Damage; Clean up Debris on Road. Division candidates: Transportation Services. Section candidates: Road Operations. Location: Dufferin St and Bloor St W. Postal area: M6H. Safety signals reported: active_danger=unknown; blocking_road=unknown.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:341128…"
+    }
+  }
+]

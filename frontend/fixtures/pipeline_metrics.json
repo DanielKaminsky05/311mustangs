@@ -1,0 +1,16 @@
+{
+  "gpu_enabled": true,
+  "device": "NVIDIA GB10 Grace Blackwell · ASUS GX10 · aarch64",
+  "rapids_cudf_version": "25.04",
+  "embedding_backend": "sentence-transformers",
+  "embedding_model": "all-MiniLM-L6-v2",
+  "llm_runtime": "Ollama (primary) · vLLM (fallback)",
+  "llm_intake_model": "llama3.2-vision:11b",
+  "llm_reasoning_model": "nemotron:70b",
+  "vector_backend": "FAISS · indexes built with cuDF",
+  "records_indexed": 190432,
+  "active_records": 8217,
+  "no_external_api_in_triage_path": true,
+  "indexed_at": "2026-05-29 21:14",
+  "data_pipeline_report_path": "var/data_pipeline_report.md"
+}

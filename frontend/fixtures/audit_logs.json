@@ -1,0 +1,155 @@
+[
+  {
+    "audit_id": "aud-001",
+    "ticket_id": "tkt-001",
+    "stage": "validation",
+    "timestamp": "2026-01-15T19:51:02",
+    "summary": "Canonical ticket validated. All required fields present.",
+    "inputs": { "fields_received": 8, "required_missing": [] },
+    "outputs": { "result": "OK" }
+  },
+  {
+    "audit_id": "aud-002",
+    "ticket_id": "tkt-001",
+    "stage": "category_inference",
+    "timestamp": "2026-01-15T19:51:03",
+    "summary": "Top-K=3 candidates returned from category_taxonomy.cuvs; confidence 0.62, margin 0.38.",
+    "inputs": { "index": "category_taxonomy", "k": 3 },
+    "outputs": { "decision": "SUGGESTED_CATEGORY" }
+  },
+  {
+    "audit_id": "aud-003",
+    "ticket_id": "tkt-001",
+    "stage": "duplicate_retrieval",
+    "timestamp": "2026-01-15T19:51:04",
+    "summary": "Active candidate sr2026-024108 matched on intersection + category + active status. Score 0.74 → POSSIBLE_DUPLICATE (not full DUPLICATE; coarse postal area).",
+    "inputs": { "index": "service_requests_active", "k": 5 },
+    "outputs": { "decision": "POSSIBLE_DUPLICATE" }
+  },
+  {
+    "audit_id": "aud-004",
+    "ticket_id": "tkt-001",
+    "stage": "urgency_scoring",
+    "timestamp": "2026-01-15T19:51:04",
+    "summary": "category_base=0.15 + hazard_boost=0.00 + keyword_boost=0.05 − penalty=0.02 = 0.18. Below 0.45 threshold → LOW_URGENCY_SCHEDULING.",
+    "inputs": { "urgent_yaml": "v1" },
+    "outputs": { "urgency_score": 0.18 }
+  },
+  {
+    "audit_id": "aud-005",
+    "ticket_id": "tkt-002",
+    "stage": "validation",
+    "timestamp": "2026-01-15T18:25:02",
+    "summary": "Canonical ticket validated. All required fields present.",
+    "inputs": {},
+    "outputs": { "result": "OK" }
+  },
+  {
+    "audit_id": "aud-006",
+    "ticket_id": "tkt-002",
+    "stage": "category_inference",
+    "timestamp": "2026-01-15T18:25:03",
+    "summary": "Confidence 0.71, margin 0.52. Clear winner: Road Pothole / Road Damage.",
+    "inputs": {},
+    "outputs": { "decision": "SUGGESTED_CATEGORY" }
+  },
+  {
+    "audit_id": "aud-007",
+    "ticket_id": "tkt-002",
+    "stage": "urgency_scoring",
+    "timestamp": "2026-01-15T18:25:04",
+    "summary": "blocking_road=true triggered hazard boost +0.22. Final 0.58 → MEDIUM_REVIEW_OR_QUEUE.",
+    "inputs": {},
+    "outputs": { "urgency_score": 0.58 }
+  },
+  {
+    "audit_id": "aud-008",
+    "ticket_id": "tkt-003",
+    "stage": "validation",
+    "timestamp": "2026-01-15T19:57:02",
+    "summary": "Canonical ticket validated.",
+    "inputs": {},
+    "outputs": { "result": "OK" }
+  },
+  {
+    "audit_id": "aud-009",
+    "ticket_id": "tkt-003",
+    "stage": "category_inference",
+    "timestamp": "2026-01-15T19:57:03",
+    "summary": "Confidence 0.78, margin 0.64. Strong match: Traffic Signal Issue.",
+    "inputs": {},
+    "outputs": { "decision": "SUGGESTED_CATEGORY" }
+  },
+  {
+    "audit_id": "aud-010",
+    "ticket_id": "tkt-003",
+    "stage": "routing",
+    "timestamp": "2026-01-15T19:57:04",
+    "summary": "Hard-route triggers fired: traffic_signal_issue=true AND active_danger=true. Forces HIGH_URGENCY_HUMAN_REVIEW regardless of numeric score (which itself reached 0.94).",
+    "inputs": { "hard_route_rules": ["injury", "active_danger", "traffic_signal_issue"] },
+    "outputs": { "route": "HUMAN_WORKFLOW" }
+  },
+  {
+    "audit_id": "aud-011",
+    "ticket_id": "tkt-004",
+    "stage": "validation",
+    "timestamp": "2026-01-15T19:34:02",
+    "summary": "Canonical ticket validated.",
+    "inputs": {},
+    "outputs": { "result": "OK" }
+  },
+  {
+    "audit_id": "aud-012",
+    "ticket_id": "tkt-004",
+    "stage": "category_inference",
+    "timestamp": "2026-01-15T19:34:03",
+    "summary": "Confidence 0.74. Top match: Flooded Basement; secondary Sewer Backup.",
+    "inputs": {},
+    "outputs": { "decision": "SUGGESTED_CATEGORY" }
+  },
+  {
+    "audit_id": "aud-013",
+    "ticket_id": "tkt-004",
+    "stage": "urgency_scoring",
+    "timestamp": "2026-01-15T19:34:04",
+    "summary": "Hazard boosts: flooding +0.18, sewage_or_water_issue +0.18. Final 0.82 → HIGH_URGENCY_HUMAN_REVIEW.",
+    "inputs": {},
+    "outputs": { "urgency_score": 0.82 }
+  },
+  {
+    "audit_id": "aud-014",
+    "ticket_id": "tkt-005",
+    "stage": "duplicate_retrieval",
+    "timestamp": "2026-01-15T20:03:04",
+    "summary": "Active candidate tkt-001 matched: same intersection, same category, active, reported < 1h ago. Score 0.93 → DUPLICATE.",
+    "inputs": {},
+    "outputs": { "decision": "DUPLICATE" }
+  },
+  {
+    "audit_id": "aud-015",
+    "ticket_id": "tkt-005",
+    "stage": "routing",
+    "timestamp": "2026-01-15T20:03:05",
+    "summary": "Routed to duplicate workflow; ticket merged onto tkt-001 as evidence.",
+    "inputs": {},
+    "outputs": { "route": "DUPLICATE_WORKFLOW", "merged_into": "tkt-001" }
+  },
+  {
+    "audit_id": "aud-016",
+    "ticket_id": "tkt-006",
+    "stage": "category_inference",
+    "timestamp": "2026-01-15T19:12:03",
+    "summary": "Top confidence 0.41, margin 0.05. Below threshold → UNCERTAIN_CATEGORY; surfacing top-3 for operator.",
+    "inputs": {},
+    "outputs": { "decision": "UNCERTAIN_CATEGORY" }
+  },
+  {
+    "audit_id": "aud-017",
+    "ticket_id": "tkt-006",
+    "stage": "routing",
+    "timestamp": "2026-01-15T19:12:04",
+    "summary": "UNCERTAIN_CATEGORY routes to human workflow for category confirmation, not auto-scheduling.",
+    "inputs": {},
+    "outputs": { "route": "HUMAN_WORKFLOW" }
+  }
+]
