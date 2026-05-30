@@ -385,19 +385,58 @@ New deps (`backend/pyproject.toml`): `twilio>=9.0`, `httpx>=0.27`.
 
 ---
 
-## Twilio setup notes (dev)
+## Prerequisites & local setup
 
-- **Sandbox:** dev runs on the shared WhatsApp Sandbox number. Each tester opts in once by
-  sending `join <two-word-code>` to the sandbox number (code in Console → Messaging →
-  Try it out → Send a WhatsApp message). Opt-in expires after 72h of inactivity; the
-  24-hour free-form reply window applies per user.
-- **Local tunnel:** Twilio can't reach `localhost`. Use the Twilio CLI's built-in tunnel
-  (or ngrok) to expose the receiver:
-  `twilio phone-numbers:update <SID> --sms-url=http://localhost:8000/api/v1/webhooks/whatsapp`
-  The CLI replaces ngrok (the pipe); it does **not** replace the receiver (our app must run).
-- **Production:** drop the CLI/tunnel, point Twilio at the deployed URL. A public,
-  no-opt-in number needs a production WhatsApp Business Sender (Meta WABA + business
-  verification + display-name review) — start that approval early; it's the slow part.
+Status legend: ✅ done in this repo/machine · ⬜ you run once.
+
+### 1. Python dependencies — ✅ installed
+`twilio>=9.0` and `httpx>=0.27` are in `backend/pyproject.toml` and installed in the venv
+(`twilio` for REST sends + signature validation, `httpx` for media download).
+
+### 2. Twilio credentials — ✅ in `.env`
+`backend/.env` (gitignored) holds `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
+`TWILIO_WHATSAPP_FROM` (= `whatsapp:+14155238886`). `app/config.py` reads them via
+pydantic-settings. **ngrok needs nothing here** — it uses its own config (see below).
+
+### 3. Twilio CLI — ✅ installed (`twilio-cli/6.2.4`), ⬜ log in
+Installed globally via `npm install -g twilio-cli`. Authenticate once:
+```
+twilio login        # prompts for Account SID + Auth Token (both in .env) + a profile name
+```
+Used for **sending test messages and tailing logs** — not for the sandbox tunnel (see why
+in §5).
+
+### 4. ngrok — ✅ installed (`3.3.1`), ⬜ add authtoken
+Installed via `winget install ngrok.ngrok`. One-time, machine-level (stored in
+`%LOCALAPPDATA%\ngrok\ngrok.yml`, **not** the project `.env`):
+```
+ngrok config add-authtoken <token>   # token from dashboard.ngrok.com (free signup)
+```
+
+### 5. Why ngrok and not the Twilio CLI tunnel
+Twilio can't reach `localhost`, so something must expose the local server publicly. The
+Twilio CLI *does* have a built-in tunnel — but only via `phone-numbers:update <SID>`, which
+targets **a number you own**. The WhatsApp **Sandbox is a shared number** whose webhook is
+set in the Console, not the Numbers API, so the CLI tunnel can't target it. → On the
+sandbox, use **ngrok** for the tunnel; the CLI is for sends/logs only. (A production WhatsApp
+sender on an owned number *would* let the CLI tunnel — but that needs Meta verification.)
+
+### 6. Per-test-run checklist — ⬜ each session
+```
+1. uvicorn (run the FastAPI app on :8000)        # the receiver
+2. ngrok http 8000                                # the pipe → prints https://xxxx.ngrok-free.app
+3. paste https://xxxx.ngrok-free.app/<webhook path> into:
+   Console → Messaging → Try it out → WhatsApp sandbox settings → "When a message comes in"
+4. testers opt in once: send `join <two-word-code>` to the sandbox number
+   (code in Console → Messaging → Try it out). Opt-in expires after 72h of inactivity;
+   the 24h free-form reply window applies per user.
+```
+⚠️ Free-tier ngrok URLs change on every restart → re-paste into the Console each time.
+
+### 7. Production (later)
+Drop ngrok + sandbox; deploy the backend to a real public URL and point Twilio at it. A
+public, no-opt-in number needs a production WhatsApp Business Sender (Meta WABA + business
+verification + display-name review) — start that approval early; it's the slow part.
 
 ---
 
