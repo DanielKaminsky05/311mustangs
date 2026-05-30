@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+/** Toronto.ca-style section panel: borderless title with a brand-blue
+ *  hairline underneath, thin grey body border, no heavy chrome. */
 export function Panel({
   title,
   subtitle,
@@ -19,26 +21,50 @@ export function Panel({
     <section
       id={id}
       className={[
-        "bg-surface border border-border rounded-sm",
+        "bg-surface border border-border rounded-[3px]",
         className ?? "",
       ].join(" ")}
     >
       {(title || actions) && (
-        <header className="flex items-start justify-between gap-3 px-4 py-3 border-b border-border bg-surface-alt/60">
+        <header className="flex items-end justify-between gap-3 px-5 pt-4 pb-3 border-b border-border">
           <div>
             {title && (
-              <h2 className="text-sm font-semibold tracking-tight text-ink">
+              <h2 className="text-lg leading-tight font-medium text-civic-blue tracking-tight">
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className="text-xs text-ink-muted mt-0.5">{subtitle}</p>
+              <p className="text-sm text-ink-muted mt-1">{subtitle}</p>
             )}
           </div>
-          {actions && <div className="flex items-center gap-2">{actions}</div>}
+          {actions && (
+            <div className="flex items-center gap-2 pb-0.5">{actions}</div>
+          )}
         </header>
       )}
-      <div className="p-4">{children}</div>
+      <div className="px-5 py-4">{children}</div>
     </section>
+  );
+}
+
+export function PageHeader({
+  title,
+  intro,
+  crumbs,
+}: {
+  title: ReactNode;
+  intro?: ReactNode;
+  crumbs?: ReactNode;
+}) {
+  return (
+    <header className="border-b border-border pb-4 mb-6">
+      {crumbs}
+      <h1 className="text-3xl sm:text-[36px] leading-[1.15] font-medium text-civic-blue tracking-tight">
+        {title}
+      </h1>
+      {intro && (
+        <p className="mt-3 text-base text-ink max-w-prose">{intro}</p>
+      )}
+    </header>
   );
 }

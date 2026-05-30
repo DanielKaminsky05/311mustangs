@@ -1,30 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  /* Civic palette */
-  --color-civic-blue: #00386f;
-  --color-civic-blue-deep: #002347;
-  --color-civic-blue-soft: #e6eef7;
-  --color-ink: #14202b;
-  --color-ink-muted: #4a5763;
-  --color-ink-faint: #8a95a0;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f4f6f8;
-  --color-border: #d8dee5;
-  --color-border-strong: #b6bec8;
+  /* Toronto.ca civic palette — captured from live site computed styles */
+  --color-civic-blue: #165788;       /* brand bar, links, headings */
+  --color-civic-blue-deep: #0f4a75;  /* hover / pressed / sub-nav */
+  --color-civic-blue-dark: #0a3b60;  /* footer / deepest chrome */
+  --color-civic-blue-soft: #e4ecf2;  /* selected row tint */
+  --color-civic-amber: #ec9f09;      /* primary CTA — used sparingly */
+  --color-civic-amber-hover: #d18d05;
 
-  /* Semantic — reserved for decision/status chips and bars */
+  --color-ink: #000000;              /* body text — pure black on Toronto.ca */
+  --color-ink-muted: #333333;        /* secondary / table meta */
+  --color-ink-faint: #6b6b6b;        /* timestamps / hints */
+  --color-surface: #ffffff;
+  --color-surface-alt: #f8f8f8;      /* zebra rows, breadcrumb strip, callout */
+  --color-border: #dddddd;
+  --color-border-strong: #bfbfbf;
+
+  /* Semantic — only for decision/status chips and bars */
   --color-decision-ok: #1f7a45;
   --color-decision-warn: #b8590a;
   --color-decision-stop: #b0263c;
-  --color-decision-neutral: #3d4a57;
-  --color-accent-spark: #76b900;
+  --color-decision-neutral: #4a5763;
+  --color-accent-spark: #76b900;     /* NVIDIA green; ONLY in Spark status strip */
 }
 
 @theme inline {
   --color-civic-blue: var(--color-civic-blue);
   --color-civic-blue-deep: var(--color-civic-blue-deep);
+  --color-civic-blue-dark: var(--color-civic-blue-dark);
   --color-civic-blue-soft: var(--color-civic-blue-soft);
+  --color-civic-amber: var(--color-civic-amber);
+  --color-civic-amber-hover: var(--color-civic-amber-hover);
+
   --color-ink: var(--color-ink);
   --color-ink-muted: var(--color-ink-muted);
   --color-ink-faint: var(--color-ink-faint);
@@ -38,8 +46,8 @@
   --color-decision-neutral: var(--color-decision-neutral);
   --color-accent-spark: var(--color-accent-spark);
 
-  --font-display: var(--font-display);
   --font-text: var(--font-text);
+  --font-display: var(--font-display);
   --font-mono: var(--font-mono);
 }
 
@@ -47,8 +55,26 @@ html,
 body {
   background: var(--color-surface);
   color: var(--color-ink);
-  font-family: var(--font-text), system-ui, sans-serif;
-  font-feature-settings: "ss01", "cv11";
+  font-family: var(--font-text), Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--color-civic-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: var(--color-civic-blue-deep);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 500; /* Toronto.ca signature: medium-weight headings, never bold */
+  color: var(--color-civic-blue);
+  letter-spacing: -0.01em;
 }
 
 *:focus-visible {

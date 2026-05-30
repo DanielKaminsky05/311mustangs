@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Roboto, JetBrains_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { CivicHeader } from "./_components/CivicHeader";
-import { NavRail, NavRailSkeleton } from "./_components/NavRail";
+import { SubNav, SubNavSkeleton } from "./_components/SubNav";
 import { StatusStrip, StatusStripSkeleton } from "./_components/StatusStrip";
 
-const inter = Inter({
+const roboto = Roboto({
   variable: "--font-text",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
   display: "swap",
 });
 
-const interDisplay = Inter({
+const robotoDisplay = Roboto({
   variable: "--font-display",
   subsets: ["latin"],
+  weight: ["500"],
   display: "swap",
-  weight: ["500", "600"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -37,23 +38,29 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${interDisplay.variable} ${jetbrains.variable} h-full antialiased`}
+      className={`${roboto.variable} ${robotoDisplay.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-civic-blue-soft/30">
+      <body className="min-h-full flex flex-col bg-surface text-ink">
         <CivicHeader />
+        <Suspense fallback={<SubNavSkeleton />}>
+          <SubNav />
+        </Suspense>
         <Suspense fallback={<StatusStripSkeleton />}>
           <StatusStrip />
         </Suspense>
-        <div className="flex flex-1 min-h-0">
-          <Suspense fallback={<NavRailSkeleton />}>
-            <NavRail />
-          </Suspense>
-          <main className="flex-1 min-w-0 overflow-y-auto">
-            <div className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8">
-              {children}
-            </div>
-          </main>
-        </div>
+        <main className="flex-1 min-w-0">
+          <div className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8">
+            {children}
+          </div>
+        </main>
+        <footer className="bg-civic-blue-dark text-white text-xs">
+          <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2">
+            <span>© 311 Mustangs · DGX Spark resolution engine demo</span>
+            <span className="font-mono opacity-80">
+              Decisions are deterministic · the agent explains, never decides
+            </span>
+          </div>
+        </footer>
       </body>
     </html>
   );

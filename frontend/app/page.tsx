@@ -4,7 +4,7 @@ import {
   getEvidencePacks,
   getRecentTickets,
 } from "./_server/data";
-import { Panel } from "./_components/Panel";
+import { Panel, PageHeader } from "./_components/Panel";
 import { DataTable, type Column } from "./_components/DataTable";
 import { DecisionChip, HardRouteBadge } from "./_components/DecisionChip";
 import { EmptyState } from "./_components/EmptyState";
@@ -113,14 +113,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Operator dashboard</h1>
-        <p className="text-sm text-ink-muted mt-1 max-w-prose">
-          Recent triage decisions and the queue of items needing human action.
-          Every score and decision shown on this surface is computed in the
-          backend; the agent explains, it never decides.
-        </p>
-      </header>
+      <PageHeader
+        title="Operator dashboard"
+        intro="Recent triage decisions and the queue of items needing human action. Every score and decision shown on this surface is computed in the backend; the agent explains, it never decides."
+      />
 
       <Panel
         title="Recent triage decisions"

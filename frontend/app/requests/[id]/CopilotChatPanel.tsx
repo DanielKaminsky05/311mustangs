@@ -50,12 +50,12 @@ export function CopilotChatPanel({
   return (
     <aside
       aria-label="Operator copilot"
-      className="border border-border rounded-sm bg-surface flex flex-col h-fit lg:sticky lg:top-4"
+      className="border border-border rounded-[3px] bg-surface flex flex-col h-fit overflow-hidden"
     >
-      <header className="flex items-center gap-2 px-3 py-2 border-b border-border bg-surface-alt">
-        <Bot size={14} className="text-civic-blue-deep" aria-hidden />
-        <h2 className="text-sm font-semibold tracking-tight">Operator copilot</h2>
-        <span className="ml-auto text-[10px] uppercase font-mono text-ink-faint">
+      <header className="flex items-center gap-2 px-3 py-2 bg-civic-blue text-white">
+        <Bot size={14} aria-hidden />
+        <h2 className="text-sm font-medium tracking-tight">Operator copilot</h2>
+        <span className="ml-auto text-[10px] uppercase font-mono text-white/80">
           explains · never decides
         </span>
       </header>

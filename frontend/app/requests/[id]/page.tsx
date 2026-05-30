@@ -7,7 +7,9 @@ import {
   getEvidencePack,
   getTicket,
 } from "../../_server/data";
-import { Panel } from "../../_components/Panel";
+import { Panel, PageHeader } from "../../_components/Panel";
+import { Breadcrumbs } from "../../_components/Breadcrumbs";
+import { SectionSidebar } from "../../_components/SectionSidebar";
 import { DefinitionList } from "../../_components/DefinitionList";
 import { DecisionChip, HardRouteBadge } from "../../_components/DecisionChip";
 import { ConfidenceList } from "../../_components/ConfidenceList";
@@ -43,34 +45,51 @@ export default async function TriagePage(props: {
   ]);
   const availableTopics = Object.keys(scripts[id] ?? {});
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-6">
-      <div className="flex flex-col gap-6 min-w-0">
-        <header className="flex flex-col gap-3">
-          <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Request{" "}
-              <span className="font-mono text-civic-blue-deep">
-                {ticket.ticket_id}
-              </span>
-            </h1>
-            <span className="text-xs text-ink-muted font-mono">
-              reported_at {ticket.reported_at} · source {ticket.source}
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <DecisionChip signal="category" value={evidence.category_decision} />
-            <DecisionChip
-              signal="duplicate"
-              value={evidence.duplicate_decision}
-            />
-            <DecisionChip signal="urgency" value={evidence.urgency_decision} />
-            <DecisionChip signal="route" value={evidence.route} />
-            <HardRouteBadge flags={evidence.hard_route_flags} />
-          </div>
-        </header>
+  const sidebarItems = [
+    { label: "Submitted ticket", href: "#submitted" },
+    { label: "Category candidates", href: "#category" },
+    { label: "Urgency score", href: "#urgency" },
+    { label: "Historical evidence", href: "#historical" },
+    { label: "Active duplicates", href: "#duplicates" },
+    { label: "Audit trail", href: "#audit" },
+  ];
 
-        <Panel title="Submitted ticket">
+  return (
+    <>
+      <PageHeader
+        crumbs={
+          <Breadcrumbs
+            items={[
+              { label: "Requests", href: "/" },
+              { label: ticket.ticket_id },
+            ]}
+          />
+        }
+        title={
+          <>
+            Request{" "}
+            <span className="font-mono text-civic-blue-deep">
+              {ticket.ticket_id}
+            </span>
+          </>
+        }
+        intro={
+          <span className="font-mono text-sm text-ink-muted">
+            reported_at {ticket.reported_at} · source {ticket.source}
+          </span>
+        }
+      />
+      <div className="flex flex-wrap items-center gap-2 -mt-2 mb-6">
+        <DecisionChip signal="category" value={evidence.category_decision} />
+        <DecisionChip signal="duplicate" value={evidence.duplicate_decision} />
+        <DecisionChip signal="urgency" value={evidence.urgency_decision} />
+        <DecisionChip signal="route" value={evidence.route} />
+        <HardRouteBadge flags={evidence.hard_route_flags} />
+      </div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_18rem] gap-6">
+      <div className="flex flex-col gap-6 min-w-0">
+        <Panel id="submitted" title="Submitted ticket">
           <div className="flex flex-col gap-4">
             <DefinitionList
               items={[
@@ -133,6 +152,7 @@ export default async function TriagePage(props: {
         </Panel>
 
         <Panel
+          id="category"
           title="Category candidates"
           subtitle="DGX vector search against the 311 category taxonomy."
         >
@@ -151,7 +171,7 @@ export default async function TriagePage(props: {
           </details>
         </Panel>
 
-        <Panel title="Urgency score">
+        <Panel id="urgency" title="Urgency score">
           <div className="flex flex-col gap-4">
             <div>
               <div className="flex items-baseline justify-between text-sm mb-2">
@@ -177,6 +197,7 @@ export default async function TriagePage(props: {
         </Panel>
 
         <Panel
+          id="historical"
           title="Nearest historical records"
           subtitle="Evidence — completed 311 records most similar to this ticket."
         >
@@ -194,6 +215,7 @@ export default async function TriagePage(props: {
         </Panel>
 
         <Panel
+          id="duplicates"
           title="Active duplicate candidates"
           subtitle={
             evidence.duplicate_decision === "NOT_DUPLICATE"
@@ -225,7 +247,7 @@ export default async function TriagePage(props: {
           )}
         </Panel>
 
-        <Panel title="Audit trail">
+        <Panel id="audit" title="Audit trail">
           <ol className="flex flex-col gap-2">
             {audits.map((a) => (
               <li
@@ -248,10 +270,14 @@ export default async function TriagePage(props: {
         </Panel>
       </div>
 
-      <CopilotChatPanel
-        ticket_id={id}
-        availableTopics={availableTopics}
-      />
+      <aside className="flex flex-col gap-4 lg:sticky lg:top-4 lg:self-start">
+        <SectionSidebar title="On this page" items={sidebarItems} />
+        <CopilotChatPanel
+          ticket_id={id}
+          availableTopics={availableTopics}
+        />
+      </aside>
     </div>
+    </>
   );
 }

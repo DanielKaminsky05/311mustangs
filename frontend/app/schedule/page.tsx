@@ -1,5 +1,6 @@
 import { getOperations, getScheduleAssignments } from "../_server/data";
-import { Panel } from "../_components/Panel";
+import { Panel, PageHeader } from "../_components/Panel";
+import { Breadcrumbs } from "../_components/Breadcrumbs";
 import { DataTable, type Column } from "../_components/DataTable";
 import { EmptyState } from "../_components/EmptyState";
 import type { Operation, ScheduleAssignment } from "../_server/types";
@@ -103,15 +104,11 @@ export default async function SchedulePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Schedule</h1>
-        <p className="text-sm text-ink-muted mt-1 max-w-prose">
-          Active operations and the ranked queue of low-urgency tickets the
-          scheduling agent has proposed inserting. The agent batches by ward,
-          service_request_type, and intersection — its proposals show up here
-          before an operator approves them.
-        </p>
-      </header>
+      <PageHeader
+        crumbs={<Breadcrumbs items={[{ label: "Schedule" }]} />}
+        title="Schedule"
+        intro="Active operations and the ranked queue of low-urgency tickets the scheduling agent has proposed inserting. The agent batches by ward, service_request_type, and intersection — its proposals show up here before an operator approves them."
+      />
 
       <Panel title="Active operations">
         {operations.length === 0 ? (

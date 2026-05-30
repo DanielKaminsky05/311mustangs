@@ -6,6 +6,7 @@ import type { DemoCase, HazardFlags } from "../_server/types";
 import { HazardFlagGridForm } from "../_components/HazardFlagGrid";
 import { UploadZone } from "../_components/UploadZone";
 import { Send, AlertOctagon } from "lucide-react";
+import { Button } from "../_components/Button";
 
 type FormDefaults = {
   case_id: string;
@@ -192,14 +193,10 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
       </div>
 
       <div className="flex items-center justify-end gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-2 bg-civic-blue text-white text-sm font-semibold px-4 py-2 rounded-sm hover:bg-civic-blue-deep disabled:opacity-60 disabled:cursor-wait"
-        >
+        <Button type="submit" variant="amber" disabled={pending}>
           <Send size={14} aria-hidden />
           {pending ? "Submitting…" : "Submit request"}
-        </button>
+        </Button>
       </div>
     </form>
   );

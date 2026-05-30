@@ -1,5 +1,6 @@
 import { getApprovalsQueue } from "../_server/data";
-import { Panel } from "../_components/Panel";
+import { Panel, PageHeader } from "../_components/Panel";
+import { Breadcrumbs } from "../_components/Breadcrumbs";
 import { DecisionChip, HardRouteBadge } from "../_components/DecisionChip";
 import { EmptyState } from "../_components/EmptyState";
 import { ApprovalActions } from "./ApprovalActions";
@@ -12,14 +13,11 @@ export default async function ApprovalsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Approvals queue</h1>
-        <p className="text-sm text-ink-muted mt-1 max-w-prose">
-          Items the system flagged for an operator: hard-routes, medium-urgency
-          requests, and uncertain categories. Approving never overrides the
-          backend score; it confirms the route the pipeline already produced.
-        </p>
-      </header>
+      <PageHeader
+        crumbs={<Breadcrumbs items={[{ label: "Approvals" }]} />}
+        title="Approvals queue"
+        intro="Items the system flagged for an operator: hard-routes, medium-urgency requests, and uncertain categories. Approving never overrides the backend score; it confirms the route the pipeline already produced."
+      />
 
       <Panel title={`${queue.length} item${queue.length === 1 ? "" : "s"}`}>
         {queue.length === 0 ? (
