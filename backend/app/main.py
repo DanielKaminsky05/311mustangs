@@ -5,12 +5,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.users import UserStore, router as users_router
+from app.whatsapp.conversation_state import ConversationStore
+from app.whatsapp.edge_router import router as whatsapp_edge_router
+from app.whatsapp.intake_router import router as whatsapp_intake_router
+from app.whatsapp.replies_router import router as whatsapp_replies_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: build shared resources. A real DB connection pool would open here.
     app.state.users = UserStore()
+    app.state.conversations = ConversationStore()
     yield
     # Shutdown: close pools / flush here. Nothing to release for in-memory.
 
@@ -37,6 +42,9 @@ def create_app() -> FastAPI:
         return {"status": "ready"}
 
     app.include_router(users_router)
+    app.include_router(whatsapp_edge_router)
+    app.include_router(whatsapp_intake_router)
+    app.include_router(whatsapp_replies_router)
     return app
 
 
