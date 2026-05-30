@@ -10,6 +10,11 @@ outcomes and data signals read [`data.md`](./data.md); for the DGX/NVIDIA story
 read [`spark-usage.md`](./spark-usage.md); for agent/tool boundaries read
 [`agents.md`](./agents.md).
 
+**Schema source of truth:** for the canonical ticket shape (intake) and the
+evidence pack shape (triage output), [`data-pipeline.md`](./data-pipeline.md) is
+authoritative. This doc describes how the dashboard **renders** those shapes;
+when this doc and `data-pipeline.md` disagree, `data-pipeline.md` wins.
+
 ## Scope clarification: which surface is this?
 
 The product has **two** human-facing surfaces. Only one of them is this app.
@@ -57,18 +62,45 @@ strip) are interactive leaves or `<Suspense>` boundaries, never statically cache
 
 ### 1. Request intake & submission panel (demo driver)
 
-The operator-facing way to push a request through the system live.
+The operator-facing way to push a request through the system live. The form
+mirrors the **canonical ticket schema** that the WhatsApp/NemoClaw intake agent
+produces (see [`data-pipeline.md`](./data-pipeline.md) §"Canonical backend ticket
+schema" and [`agents.md`](./agents.md) §"WhatsApp / NemoClaw intake agent").
+
+Important: `service_request_type` is **not** a form field. The backend infers
+category from taxonomy search; asking the operator to pick it would short-circuit
+the DGX retrieval story.
 
 ```text
-fields:        free-text description, service_request_type (supported lanes), location/intersection hint, ward (optional)
-file upload:   one or more photos/documents attached to the request (see section 2)
+fields:
+  description           free-text, required
+  location              raw_text + intersection_street_1/2,
+                        postal_code_or_fsa, ward (optional), lat/lon (optional)
+  observed_at           datetime, required (defaults to demo_clock)
+  hazard_flags          7 tri-state checks (yes/no/unknown), all required:
+                          injury, active_danger,
+                          blocking_road, blocking_sidewalk,
+                          flooding, sewage_or_water_issue,
+                          traffic_signal_issue
+file upload:   media_refs[] populated by upload subsystem (section 2)
 demo helper:   "load scripted demo case" picker for the data.md cases
 clock:         respects demo_clock = 2026-01-15 20:00 so permit/date windows line up
 ```
 
 Submitting calls a backend Server Function that normalizes the request, runs the
-DGX embed-and-search path, computes deterministic scores, and returns a triage
-decision. The UI renders the result; it never computes scores itself.
+DGX embed-and-search path, computes deterministic scores, and returns an
+**evidence pack** (`data-pipeline.md` §Stage 7). The UI renders the result; it
+never computes scores itself.
+
+**`NEEDS_MORE_INFO` handling:** if required fields are missing or invalid the
+backend returns `NEEDS_MORE_INFO` with a list of specific missing fields
+(`data-pipeline.md` §Stage 1). The form must surface which fields need filling
+and re-prompt the operator, rather than treating the response as a generic error.
+
+Hazard flags matter because three of them — `injury`, `active_danger`,
+`traffic_signal_issue` — are **hard-route triggers** that force
+`HIGH_URGENCY_HUMAN_REVIEW` regardless of urgency score. The form must collect
+them explicitly; "unknown" is a valid value and is not silently coerced to false.
 
 ### 2. File upload subsystem (NEW — required)
 
@@ -136,17 +168,43 @@ the deterministic scores.
 
 ### 3. Triage outcome view (core screen)
 
-For each processed request, show the deterministic decision and its scores. The
-UI displays backend-owned values; it must **not** invent or recompute them.
+For each processed request, show the **evidence pack** the backend produced
+(`data-pipeline.md` §Stage 7 is authoritative). The UI displays backend-owned
+values; it must **not** invent, fuse, or recompute them.
+
+Render the four backend decisions in **parallel**, not collapsed into a single
+label — this is the operator's audit surface:
 
 ```text
-decision labels:  DUPLICATE | AUTO_SCHEDULE | AUTO_SCHEDULE_PENDING_APPROVAL
-                  | HUMAN_REVIEW | AUTO_RESOLVE   (noise AUTO_RESOLVE is DEFERRED until MVP)
-score breakdown:  duplicate_score, historical_similarity_score, category_supported_score,
-                  public_safety_score, schedule_insertion_score, confidence_score
-                  (noise_permit_match_score / utility_cut_conflict_score DEFERRED until MVP)
-attachments:      show thumbnails/links for files submitted with the request
+category_decision:    SUGGESTED_CATEGORY | UNCERTAIN_CATEGORY
+duplicate_decision:   DUPLICATE | POSSIBLE_DUPLICATE | NOT_DUPLICATE
+urgency_decision:     HIGH_URGENCY_HUMAN_REVIEW
+                    | MEDIUM_REVIEW_OR_QUEUE
+                    | LOW_URGENCY_SCHEDULING
+route:                SCHEDULING_AGENT | human workflow | duplicate workflow
 ```
+
+Operator dispositions (auto-scheduled, pending approval, overridden, etc.) are
+**derived UI states** computed from `route` plus the approvals overlay — they
+are not labels the backend emits.
+
+Supporting fields rendered on this screen:
+
+```text
+category candidates:   top-K list with similarity, confidence, and margin
+top-level scores:      urgency_score, duplicate_score,
+                       category_confidence, category_margin
+score breakdown:       category_base_score, hazard_boost_total,
+                       keyword_boost_total, penalty_total
+hazard flags:          the 7 booleans from the submitted ticket
+                       (highlight hard-route flags that fired)
+attachments:           thumbnails/links for media_refs
+audit_refs:            linked to audit log entries; copilot chat citations
+                       resolve into these
+```
+
+(Noise permit / utility-cut evidence panels remain DEFERRED until MVP — track
+[`data.md`](./data.md).)
 
 ### 4. Evidence panel (DGX grounding proof)
 
@@ -215,16 +273,19 @@ The dashboard is a **read-and-approve** view over backend-owned state
 (`data.md` persistence handoff). It renders these; it does not recompute them:
 
 ```text
-service_requests          -> normalized 311 rows and submitted requests
+service_requests          -> normalized 311 rows and submitted canonical tickets
+                             (schema: data-pipeline.md §Canonical backend ticket schema)
 request_attachments        -> uploaded file metadata (see below)   [NEW]
-triage_decisions          -> decision label, score breakdown, evidence_json
+triage_decisions          -> full evidence pack per ticket
+                             (schema: data-pipeline.md §Stage 7 routing output)
 request_embeddings        -> embedding/index references (for evidence display)
 operations                -> seeded/active demo operations (DAG nodes)
 operation_dependencies    -> DAG / conflict edges
 schedule_assignments      -> ranked/baseline schedule rows
-audit_logs                -> per-decision evidence + reasoning trail
+audit_logs                -> per-stage evidence + reasoning trail; referenced
+                             by triage_decisions.audit_refs[]
 data_pipeline_runs        -> NVIDIA-stack metrics for the status panel
-demo_cases                -> scripted demo inputs for the intake picker
+demo_cases                -> scripted canonical-ticket inputs for the intake picker
 ```
 
 **Proposed `request_attachments` row (new, owned by backend):**
