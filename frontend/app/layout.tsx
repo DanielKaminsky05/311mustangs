@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import { CivicHeader } from "./_components/CivicHeader";
 import { SubNav, SubNavSkeleton } from "./_components/SubNav";
-import { StatusStrip, StatusStripSkeleton } from "./_components/StatusStrip";
+import { SystemStatus, SystemStatusSkeleton } from "./_components/SystemStatus";
 
 const roboto = Roboto({
   variable: "--font-text",
@@ -41,12 +41,15 @@ export default function RootLayout({
       className={`${roboto.variable} ${robotoDisplay.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface text-ink">
-        <CivicHeader />
+        <CivicHeader
+          rightSlot={
+            <Suspense fallback={<SystemStatusSkeleton />}>
+              <SystemStatus />
+            </Suspense>
+          }
+        />
         <Suspense fallback={<SubNavSkeleton />}>
           <SubNav />
-        </Suspense>
-        <Suspense fallback={<StatusStripSkeleton />}>
-          <StatusStrip />
         </Suspense>
         <main className="flex-1 min-w-0">
           <div className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8">
@@ -55,9 +58,9 @@ export default function RootLayout({
         </main>
         <footer className="bg-civic-blue-dark text-white text-xs">
           <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2">
-            <span>© 311 Mustangs · DGX Spark resolution engine demo</span>
-            <span className="font-mono opacity-80">
-              Decisions are deterministic · the agent explains, never decides
+            <span>© City of Toronto · 311 Operator Console</span>
+            <span className="opacity-80">
+              You are always the one who decides what gets sent.
             </span>
           </div>
         </footer>

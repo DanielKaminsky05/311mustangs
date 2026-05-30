@@ -1,10 +1,11 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Phone } from "lucide-react";
 
 /** Toronto.ca-style brand bar: skyline glyph + TORONTO wordmark, centered
  *  search/utility, amber CTA on the right. Reproduces the live header
  *  proportions (~84px row + ~44px sub-nav). */
-export function CivicHeader() {
+export function CivicHeader({ rightSlot }: { rightSlot?: ReactNode } = {}) {
   return (
     <header className="shrink-0">
       <div className="bg-civic-blue text-white">
@@ -52,6 +53,7 @@ export function CivicHeader() {
           </div>
 
           <div className="ml-auto flex items-center gap-3">
+            {rightSlot}
             <Link
               href="/submit"
               className="hidden sm:inline-flex items-center gap-2 h-9 px-3 bg-civic-amber text-black text-sm font-medium rounded-[3px] no-underline hover:bg-civic-amber-hover hover:text-black"

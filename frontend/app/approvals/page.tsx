@@ -6,6 +6,7 @@ import { DecisionChip, HardRouteBadge } from "../_components/DecisionChip";
 import { EmptyState } from "../_components/EmptyState";
 import { ApprovalActions } from "./ApprovalActions";
 import Link from "next/link";
+import { translateFiringReason } from "../_lib/translations";
 
 export const metadata = { title: "Approvals · 311 Mustangs" };
 
@@ -18,7 +19,7 @@ export default async function ApprovalsPage() {
         crumbs={<Breadcrumbs items={[{ label: "Approvals" }]} />}
         actions={<PageUtilityButtons />}
         title="Approvals queue"
-        intro="Items the system flagged for an operator: hard-routes, medium-urgency requests, and uncertain categories. Approving never overrides the backend score; it confirms the route the pipeline already produced."
+        intro="Requests the system flagged for you to look at — usually because of a safety issue, a medium-urgency call, or because the category was unclear. Approving sends the request to the suggested next step; you can override or hand it off."
       />
 
       <Panel title={`${queue.length} item${queue.length === 1 ? "" : "s"}`}>
@@ -69,22 +70,25 @@ export default async function ApprovalsPage() {
                 <div className="px-3 py-2 grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
                   <div className="text-xs text-ink-muted">
                     <p className="uppercase tracking-wide text-ink-faint">
-                      Firing reason
+                      Why flagged
                     </p>
-                    <p className="font-mono text-ink mt-0.5">
-                      {row.firing_reason}
+                    <p
+                      className="text-ink mt-0.5"
+                      title={row.firing_reason}
+                    >
+                      {translateFiringReason(row.firing_reason)}
                     </p>
                     <p className="mt-2 uppercase tracking-wide text-ink-faint">
-                      Top category candidate
+                      Suggested category
                     </p>
                     <p className="text-ink mt-0.5">
                       {row.evidence.category_candidates[0]?.service_request_type}{" "}
                       <span className="text-ink-faint font-mono">
-                        (conf{" "}
-                        {row.evidence.category_candidates[0]?.confidence.toFixed(
-                          2,
+                        ({Math.round(
+                          (row.evidence.category_candidates[0]?.confidence ??
+                            0) * 100,
                         )}
-                        )
+                        % confidence)
                       </span>
                     </p>
                   </div>
@@ -95,8 +99,13 @@ export default async function ApprovalsPage() {
                         candidates={row.evidence.category_candidates}
                       />
                     ) : (
-                      <p className="text-xs font-mono text-ink-muted">
-                        decided by {row.decided_by} at {row.decided_at}
+                      <p className="text-xs text-ink-muted">
+                        {row.status === "approved"
+                          ? "Approved"
+                          : row.status === "overridden"
+                            ? "Category overridden"
+                            : "Sent to a human reviewer"}{" "}
+                        by {row.decided_by} · {row.decided_at}
                       </p>
                     )}
                   </div>

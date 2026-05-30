@@ -2,6 +2,7 @@ import { getOperations, getScheduleAssignments } from "../_server/data";
 import { Panel, PageHeader } from "../_components/Panel";
 import { PageUtilityButtons } from "../_components/PageUtilityButtons";
 import { Breadcrumbs } from "../_components/Breadcrumbs";
+import { columnLabels } from "../_lib/translations";
 import { DataTable, type Column } from "../_components/DataTable";
 import { EmptyState } from "../_components/EmptyState";
 import type { Operation, ScheduleAssignment } from "../_server/types";
@@ -21,28 +22,34 @@ export default async function SchedulePage() {
   ]);
   const opById = new Map(operations.map((o) => [o.operation_id, o]));
 
+  const STATUS_LABEL: Record<Operation["status"], string> = {
+    scheduled: "Scheduled",
+    in_progress: "In progress",
+    completed: "Completed",
+  };
+
   const opColumns: Column<Operation>[] = [
     {
       key: "operation_id",
-      header: "operation_id",
+      header: columnLabels.operation_id,
       cell: (o) => <span className="font-mono">{o.operation_id}</span>,
       width: "8rem",
     },
-    { key: "category", header: "category" },
-    { key: "ward", header: "ward" },
-    { key: "intersection", header: "intersection" },
+    { key: "category", header: columnLabels.category },
+    { key: "ward", header: columnLabels.ward },
+    { key: "intersection", header: columnLabels.intersection },
     {
       key: "status",
-      header: "status",
+      header: columnLabels.status,
       cell: (o) => (
-        <span className={`font-mono text-xs ${STATUS_CLASS[o.status]}`}>
-          {o.status}
+        <span className={`text-xs ${STATUS_CLASS[o.status]}`}>
+          {STATUS_LABEL[o.status]}
         </span>
       ),
     },
     {
       key: "scheduled_for",
-      header: "scheduled_for",
+      header: columnLabels.scheduled_for,
       cell: (o) => (
         <span className="font-mono text-xs">{o.scheduled_for}</span>
       ),
@@ -52,40 +59,40 @@ export default async function SchedulePage() {
   const asColumns: Column<ScheduleAssignment>[] = [
     {
       key: "ticket_id",
-      header: "ticket_id",
+      header: columnLabels.ticket_id,
       cell: (a) => (
         <a
           href={`/requests/${a.ticket_id}`}
-          className="font-mono text-civic-blue-deep hover:underline"
+          className="font-mono text-civic-blue hover:text-civic-blue-deep"
         >
           {a.ticket_id}
         </a>
       ),
       width: "8rem",
     },
-    { key: "category", header: "category" },
+    { key: "category", header: columnLabels.category },
     {
       key: "proposed_slot",
-      header: "proposed_slot",
+      header: columnLabels.proposed_slot,
       cell: (a) => (
         <span className="font-mono text-xs">{a.proposed_slot}</span>
       ),
     },
     {
       key: "rank",
-      header: "rank",
-      cell: (a) => <span className="font-mono text-xs">#{a.rank}</span>,
+      header: columnLabels.rank,
+      cell: (a) => <span className="text-xs">#{a.rank}</span>,
       width: "4rem",
     },
     {
       key: "batches_with",
-      header: "batches_with",
+      header: columnLabels.batches_with,
       cell: (a) =>
         a.batches_with ? (
-          <span className="font-mono text-xs">
-            {a.batches_with}{" "}
-            <span className="text-ink-faint">
-              ({opById.get(a.batches_with)?.intersection ?? "—"})
+          <span className="text-xs">
+            {opById.get(a.batches_with)?.intersection ?? a.batches_with}{" "}
+            <span className="text-ink-faint font-mono">
+              ({a.batches_with})
             </span>
           </span>
         ) : (
@@ -94,9 +101,9 @@ export default async function SchedulePage() {
     },
     {
       key: "explanation",
-      header: "explanation",
+      header: columnLabels.explanation,
       cell: (a) => (
-        <span className="text-xs text-ink-muted line-clamp-2" title={a.explanation}>
+        <span className="text-xs text-ink-muted line-clamp-3" title={a.explanation}>
           {a.explanation}
         </span>
       ),
@@ -109,7 +116,7 @@ export default async function SchedulePage() {
         crumbs={<Breadcrumbs items={[{ label: "Schedule" }]} />}
         actions={<PageUtilityButtons />}
         title="Schedule"
-        intro="Active operations and the ranked queue of low-urgency tickets the scheduling agent has proposed inserting. The agent batches by ward, service_request_type, and intersection — its proposals show up here before an operator approves them."
+        intro="Crews that are already scheduled, and the new low-urgency requests the system has suggested batching with them. Open a row to see why two requests were grouped together."
       />
 
       <Panel title="Active operations">

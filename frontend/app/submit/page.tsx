@@ -14,19 +14,10 @@ export default async function SubmitPage() {
         crumbs={<Breadcrumbs items={[{ label: "New request" }]} />}
         actions={<PageUtilityButtons />}
         title="New request"
-        intro={
-          <>
-            This form mirrors the canonical ticket the WhatsApp intake agent
-            produces. The backend infers{" "}
-            <code className="font-mono text-sm">service_request_type</code>{" "}
-            from category taxonomy — it isn&apos;t collected here. Hazard
-            flags are required because three of them are hard-route triggers
-            for immediate human review.
-          </>
-        }
+        intro="Submit a request the same way the WhatsApp intake bot would. You don't pick a category — the system suggests one. The safety questions help route urgent issues to a person right away."
       />
 
-      <Panel title="Canonical ticket">
+      <Panel title="New request">
         <SubmitForm demoCases={demoCases} />
       </Panel>
     </div>

@@ -4,7 +4,20 @@ import type {
   Route,
   UrgencyDecision,
 } from "../_server/types";
-import { Check, AlertTriangle, AlertOctagon, Workflow, MinusCircle } from "lucide-react";
+import {
+  Check,
+  AlertTriangle,
+  AlertOctagon,
+  Workflow,
+  MinusCircle,
+} from "lucide-react";
+import {
+  categoryLabels,
+  duplicateLabels,
+  hardRouteLabels,
+  routeLabels,
+  urgencyLabels,
+} from "../_lib/translations";
 
 type Kind = "ok" | "warn" | "stop" | "neutral";
 
@@ -23,10 +36,7 @@ const ICON: Record<Kind, React.ComponentType<{ size?: number; "aria-hidden"?: bo
   neutral: MinusCircle,
 };
 
-function kindFor(
-  signal: string,
-  value: string,
-): Kind {
+function kindFor(signal: string, value: string): Kind {
   if (signal === "category") {
     return value === "SUGGESTED_CATEGORY" ? "ok" : "warn";
   }
@@ -47,6 +57,19 @@ function kindFor(
   return "neutral";
 }
 
+function labelFor(
+  signal: "category" | "duplicate" | "urgency" | "route",
+  value: CategoryDecision | DuplicateDecision | UrgencyDecision | Route,
+): string {
+  if (signal === "category")
+    return categoryLabels[value as CategoryDecision].label;
+  if (signal === "duplicate")
+    return duplicateLabels[value as DuplicateDecision].label;
+  if (signal === "urgency")
+    return urgencyLabels[value as UrgencyDecision].label;
+  return routeLabels[value as Route].label;
+}
+
 export function DecisionChip({
   signal,
   value,
@@ -56,17 +79,19 @@ export function DecisionChip({
   value: CategoryDecision | DuplicateDecision | UrgencyDecision | Route;
   size?: "sm" | "md";
 }) {
+  const label = labelFor(signal, value);
   if (signal === "route") {
     return (
       <span
+        title={`route=${value}`}
         className={[
-          "inline-flex items-center gap-1.5 border rounded-sm",
+          "inline-flex items-center gap-1.5 border rounded-[3px]",
           KIND_CLASS.neutral,
-          size === "sm" ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-0.5 text-[11px]",
+          size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs",
         ].join(" ")}
       >
-        <Workflow size={size === "sm" ? 10 : 12} aria-hidden />
-        <span className="font-mono uppercase tracking-wide">{value}</span>
+        <Workflow size={size === "sm" ? 12 : 14} aria-hidden />
+        <span>{label}</span>
       </span>
     );
   }
@@ -74,24 +99,31 @@ export function DecisionChip({
   const Icon = ICON[kind];
   return (
     <span
+      title={`${signal}_decision=${value}`}
       className={[
-        "inline-flex items-center gap-1.5 border rounded-sm font-mono uppercase tracking-wide",
+        "inline-flex items-center gap-1.5 border rounded-[3px]",
         KIND_CLASS[kind],
-        size === "sm" ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-0.5 text-[11px]",
+        size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs",
       ].join(" ")}
     >
-      <Icon size={size === "sm" ? 10 : 12} aria-hidden />
-      <span>{value}</span>
+      <Icon size={size === "sm" ? 12 : 14} aria-hidden />
+      <span>{label}</span>
     </span>
   );
 }
 
 export function HardRouteBadge({ flags }: { flags: string[] }) {
   if (!flags || flags.length === 0) return null;
+  const labels = flags.map(
+    (k) => hardRouteLabels[k as keyof typeof hardRouteLabels] ?? k,
+  );
   return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 border border-[color:var(--color-decision-stop)]/40 bg-[color:var(--color-decision-stop)]/10 text-[color:var(--color-decision-stop)] text-[11px] font-mono uppercase tracking-wide rounded-sm">
+    <span
+      title={`hard_routes_triggered: ${flags.join(", ")}`}
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-[color:var(--color-decision-stop)]/40 bg-[color:var(--color-decision-stop)]/10 text-[color:var(--color-decision-stop)] text-xs rounded-[3px]"
+    >
       <AlertOctagon size={12} aria-hidden />
-      <span>HARD-ROUTE: {flags.join(", ")}</span>
+      <span>Sent to human review · {labels.join(", ")}</span>
     </span>
   );
 }

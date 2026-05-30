@@ -11,6 +11,14 @@ import { Panel, PageHeader } from "../../_components/Panel";
 import { PageUtilityButtons } from "../../_components/PageUtilityButtons";
 import { Breadcrumbs } from "../../_components/Breadcrumbs";
 import { SectionSidebar } from "../../_components/SectionSidebar";
+import {
+  categoryLabels,
+  describeStrength,
+  duplicateLabels,
+  hardRouteLabels,
+  routeLabels,
+  urgencyLabels,
+} from "../../_lib/translations";
 import { DefinitionList } from "../../_components/DefinitionList";
 import { DecisionChip, HardRouteBadge } from "../../_components/DecisionChip";
 import { ConfidenceList } from "../../_components/ConfidenceList";
@@ -45,12 +53,12 @@ export default async function TriagePage(props: {
   const availableTopics = Object.keys(scripts[id] ?? {});
 
   const sidebarItems = [
-    { label: "Submitted ticket", href: "#submitted" },
-    { label: "Category candidates", href: "#category" },
-    { label: "Urgency score", href: "#urgency" },
-    { label: "Historical evidence", href: "#historical" },
-    { label: "Active duplicates", href: "#duplicates" },
-    { label: "Audit trail", href: "#audit" },
+    { label: "What the citizen said", href: "#submitted" },
+    { label: "Best matching categories", href: "#category" },
+    { label: "How urgent is it?", href: "#urgency" },
+    { label: "Past similar requests", href: "#historical" },
+    { label: "Open requests that look like this", href: "#duplicates" },
+    { label: "What the system did, step by step", href: "#audit" },
   ];
 
   return (
@@ -74,8 +82,10 @@ export default async function TriagePage(props: {
           </>
         }
         intro={
-          <span className="font-mono text-sm text-ink-muted">
-            reported_at {ticket.reported_at} · source {ticket.source}
+          <span className="text-sm text-ink-muted">
+            Reported{" "}
+            <span className="font-mono">{ticket.reported_at}</span> via{" "}
+            <span className="font-medium">{ticket.source}</span>
           </span>
         }
       />
@@ -89,20 +99,89 @@ export default async function TriagePage(props: {
 
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_18rem] gap-6">
       <div className="flex flex-col gap-6 min-w-0">
-        <Panel id="submitted" title="Submitted ticket">
+        <Panel title="What we found">
+          <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-x-4 gap-y-3 text-sm">
+            <dt className="text-xs uppercase tracking-wide text-ink-faint pt-0.5">
+              Category
+            </dt>
+            <dd className="text-ink">
+              <p>
+                <span className="font-medium">
+                  {evidence.category_candidates[0]?.service_request_type ??
+                    "Unknown"}
+                </span>{" "}
+                <span className="text-ink-muted">
+                  ({evidence.category_candidates[0]?.division})
+                </span>
+              </p>
+              <p className="text-xs text-ink-muted">
+                {categoryLabels[evidence.category_decision].hint}
+              </p>
+            </dd>
+
+            <dt className="text-xs uppercase tracking-wide text-ink-faint pt-0.5">
+              Duplicate
+            </dt>
+            <dd className="text-ink">
+              <p className="font-medium">
+                {duplicateLabels[evidence.duplicate_decision].label}
+              </p>
+              {duplicateLabels[evidence.duplicate_decision].hint && (
+                <p className="text-xs text-ink-muted">
+                  {duplicateLabels[evidence.duplicate_decision].hint}
+                </p>
+              )}
+            </dd>
+
+            <dt className="text-xs uppercase tracking-wide text-ink-faint pt-0.5">
+              Urgency
+            </dt>
+            <dd className="text-ink">
+              <p className="font-medium">
+                {urgencyLabels[evidence.urgency_decision].label}
+              </p>
+              <p className="text-xs text-ink-muted">
+                {urgencyLabels[evidence.urgency_decision].hint}
+              </p>
+              {evidence.score_breakdown.hard_routes_triggered.length > 0 && (
+                <p className="text-xs text-[color:var(--color-decision-stop)] mt-1">
+                  Hard-route reasons:{" "}
+                  {evidence.score_breakdown.hard_routes_triggered
+                    .map(
+                      (k) =>
+                        hardRouteLabels[k as keyof typeof hardRouteLabels],
+                    )
+                    .join(", ")}
+                </p>
+              )}
+            </dd>
+
+            <dt className="text-xs uppercase tracking-wide text-ink-faint pt-0.5">
+              Next step
+            </dt>
+            <dd className="text-ink">
+              <p className="font-medium">{routeLabels[evidence.route].label}</p>
+              <p className="text-xs text-ink-muted">
+                {routeLabels[evidence.route].hint}
+              </p>
+            </dd>
+          </dl>
+        </Panel>
+
+        <Panel id="submitted" title="What the citizen said">
           <div className="flex flex-col gap-4">
             <DefinitionList
               items={[
-                { label: "description", value: ticket.description },
+                { label: "The issue", value: ticket.description },
                 {
-                  label: "location",
+                  label: "Where",
                   value: (
                     <>
                       <p>{ticket.location.raw_text}</p>
-                      <p className="text-xs text-ink-muted font-mono">
+                      <p className="text-xs text-ink-muted">
                         {ticket.location.intersection_street_1 ?? "—"} /{" "}
-                        {ticket.location.intersection_street_2 ?? "—"} · FSA{" "}
-                        {ticket.location.postal_code_or_fsa ?? "—"}
+                        {ticket.location.intersection_street_2 ?? "—"} · postal
+                        area {ticket.location.postal_code_or_fsa ?? "—"}
                       </p>
                       <p className="text-xs text-ink-muted">
                         {ticket.location.ward ?? "—"}
@@ -111,7 +190,7 @@ export default async function TriagePage(props: {
                   ),
                 },
                 {
-                  label: "observed_at",
+                  label: "When seen",
                   value: ticket.observed_at,
                   mono: true,
                 },
@@ -119,7 +198,7 @@ export default async function TriagePage(props: {
             />
             <div>
               <p className="text-xs uppercase tracking-wide text-ink-faint mb-2">
-                hazard_flags
+                Safety check
               </p>
               <SafetyAnswersReadout
                 answers={ticket.safety_answers}
@@ -129,7 +208,7 @@ export default async function TriagePage(props: {
             </div>
             <div>
               <p className="text-xs uppercase tracking-wide text-ink-faint mb-2">
-                attachments
+                Attachments
               </p>
               {attachments.length === 0 ? (
                 <p className="text-sm text-ink-muted">No attachments.</p>
@@ -154,72 +233,102 @@ export default async function TriagePage(props: {
 
         <Panel
           id="category"
-          title="Category candidates"
-          subtitle="DGX vector search against the 311 category taxonomy."
+          title="Best matching categories"
+          subtitle="What the system thinks this request is about, ranked by how well it matches."
         >
           <ConfidenceList
             candidates={evidence.category_candidates}
             confidence={evidence.category_confidence}
             margin={evidence.category_margin}
           />
-          <div className="mt-4 flex flex-col gap-3">
-            <details>
-              <summary className="cursor-pointer text-xs text-ink-muted hover:text-ink">
-                Category query text · embedded against the category taxonomy
-              </summary>
-              <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-[3px]">
-                {evidence.category_query_text}
-              </pre>
-            </details>
-            <details>
-              <summary className="cursor-pointer text-xs text-ink-muted hover:text-ink">
-                Retrieval query text · category-augmented, embedded against
-                historical / active indexes
-              </summary>
-              <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-[3px]">
-                {evidence.retrieval_query_text}
-              </pre>
-            </details>
-            <p className="text-[11px] font-mono text-ink-faint">
-              embedding: {evidence.embedding_ref.embedding_model} · dim{" "}
-              {evidence.embedding_ref.embedding_dim} · hash{" "}
-              {evidence.embedding_ref.structured_text_hash}
-            </p>
-          </div>
-        </Panel>
-
-        <Panel id="urgency" title="Urgency score">
-          <div className="flex flex-col gap-4">
-            <div>
-              <div className="flex items-baseline justify-between text-sm mb-2">
-                <span className="font-mono text-ink-muted">urgency_score</span>
-                <span className="font-mono text-xl text-ink tabular-nums">
-                  {evidence.urgency_score.toFixed(2)}
-                </span>
+          <details className="mt-4">
+            <summary className="cursor-pointer text-xs text-ink-muted hover:text-ink">
+              Show technical details
+            </summary>
+            <div className="mt-2 flex flex-col gap-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-1">
+                  What we searched against the category list
+                </p>
+                <pre className="whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-[3px]">
+                  {evidence.category_query_text}
+                </pre>
               </div>
-              <ScoreBar
-                value={evidence.urgency_score}
-                ticks={[0.45, 0.75]}
-                variant="urgency"
-              />
-              <p className="mt-2 text-[11px] text-ink-faint font-mono">
-                thresholds: ≥ 0.45 review · ≥ 0.75 human review
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-ink-faint mb-1">
+                  What we searched against past / open requests
+                </p>
+                <pre className="whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-[3px]">
+                  {evidence.retrieval_query_text}
+                </pre>
+              </div>
+              <p className="text-[11px] font-mono text-ink-faint">
+                embedding: {evidence.embedding_ref.embedding_model} · dim{" "}
+                {evidence.embedding_ref.embedding_dim} · hash{" "}
+                {evidence.embedding_ref.structured_text_hash}
               </p>
             </div>
-            <ScoreBreakdown
-              breakdown={evidence.score_breakdown}
-              total={evidence.urgency_score}
-            />
-          </div>
+          </details>
+        </Panel>
+
+        <Panel id="urgency" title="How urgent is it?">
+          {(() => {
+            const urgencyStrength = describeStrength(evidence.urgency_score);
+            return (
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="text-base text-ink">
+                    <span className="font-medium">
+                      {urgencyLabels[evidence.urgency_decision].label}
+                    </span>{" "}
+                    <span
+                      className="text-sm text-ink-muted"
+                      title={`urgency_score=${evidence.urgency_score.toFixed(2)}`}
+                    >
+                      ({Math.round(evidence.urgency_score * 100)}% on the urgency scale)
+                    </span>
+                  </p>
+                  <p className="text-sm text-ink-muted mt-1">
+                    {urgencyLabels[evidence.urgency_decision].hint}
+                  </p>
+                </div>
+                <ScoreBar
+                  value={evidence.urgency_score}
+                  ticks={[0.45, 0.75]}
+                  variant="urgency"
+                />
+                <p className="text-xs text-ink-muted">
+                  The system flags requests for review above{" "}
+                  <span className="font-mono">0.45</span> and sends them
+                  straight to a person above{" "}
+                  <span className="font-mono">0.75</span>.{" "}
+                  <span className={urgencyStrength.className}>
+                    {urgencyStrength.band} score.
+                  </span>
+                </p>
+                <details>
+                  <summary className="cursor-pointer text-sm text-ink-muted hover:text-ink">
+                    Show how we got that score
+                  </summary>
+                  <div className="mt-3">
+                    <ScoreBreakdown
+                      breakdown={evidence.score_breakdown}
+                      total={evidence.urgency_score}
+                    />
+                  </div>
+                </details>
+              </div>
+            );
+          })()}
         </Panel>
 
         <Panel
           id="historical"
-          title="Nearest historical records"
-          subtitle="Evidence — completed 311 records most similar to this ticket."
+          title="Past similar requests"
+          subtitle="Completed 311 requests that look like this one. Useful for context — how was this kind of thing handled before?"
         >
           {evidence.nearest_historical_records.length === 0 ? (
-            <EmptyState title="No historical matches above threshold." />
+            <EmptyState title="No past requests look similar enough to show." />
           ) : (
             <ul className="flex flex-col gap-2">
               {evidence.nearest_historical_records.map((r) => (
@@ -233,24 +342,22 @@ export default async function TriagePage(props: {
 
         <Panel
           id="duplicates"
-          title="Active duplicate candidates"
+          title="Open requests that look like this one"
           subtitle={
             evidence.duplicate_decision === "NOT_DUPLICATE"
-              ? "No active duplicates after metadata filtering."
-              : "Active matches after metadata filtering."
+              ? "Nothing open looks like a duplicate."
+              : "Open requests that may already cover this issue."
           }
         >
           {evidence.active_duplicate_candidates.length === 0 ? (
             <EmptyState
-              title="NOT_DUPLICATE"
+              title="No likely duplicates"
               hint={
-                <>
-                  duplicate_score{" "}
-                  <span className="font-mono">
-                    {evidence.duplicate_score.toFixed(2)}
-                  </span>{" "}
-                  · below threshold.
-                </>
+                <span title={`duplicate_score=${evidence.duplicate_score.toFixed(2)}`}>
+                  Duplicate confidence is only{" "}
+                  {Math.round(evidence.duplicate_score * 100)}% — below the
+                  threshold to flag.
+                </span>
               }
             />
           ) : (
@@ -264,26 +371,46 @@ export default async function TriagePage(props: {
           )}
         </Panel>
 
-        <Panel id="audit" title="Audit trail">
-          <ol className="flex flex-col gap-2">
-            {audits.map((a) => (
-              <li
-                key={a.audit_id}
-                id={a.audit_id}
-                className="border border-border rounded-sm bg-surface-alt/30 px-3 py-2 target:bg-civic-blue-soft target:border-civic-blue"
-              >
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-xs font-mono text-ink-muted">
-                    {a.audit_id} · {a.stage}
-                  </p>
-                  <p className="text-[11px] font-mono text-ink-faint">
-                    {a.timestamp}
-                  </p>
-                </div>
-                <p className="text-sm text-ink mt-1">{a.summary}</p>
-              </li>
-            ))}
-          </ol>
+        <Panel
+          id="audit"
+          title="What the system did, step by step"
+          subtitle="Every decision can be traced back to one of these steps. Citations in the copilot answers link directly into this list."
+        >
+          {(() => {
+            const STAGE_LABEL: Record<string, string> = {
+              validation: "Checked the request",
+              structured_text: "Built the text to search",
+              category_inference: "Picked the best category",
+              historical_similarity: "Found past similar requests",
+              duplicate_retrieval: "Looked for open duplicates",
+              urgency_scoring: "Scored the urgency",
+              routing: "Decided where to send it",
+            };
+            return (
+              <ol className="flex flex-col gap-2">
+                {audits.map((a) => (
+                  <li
+                    key={a.audit_id}
+                    id={a.audit_id}
+                    className="border border-border rounded-[3px] bg-surface-alt/30 px-3 py-2 scroll-mt-24 target:bg-civic-blue-soft target:border-civic-blue"
+                  >
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-sm font-medium text-ink">
+                        {STAGE_LABEL[a.stage] ?? a.stage}
+                      </p>
+                      <p className="text-[11px] font-mono text-ink-faint">
+                        {a.timestamp}
+                      </p>
+                    </div>
+                    <p className="text-sm text-ink mt-1">{a.summary}</p>
+                    <p className="text-[10px] font-mono text-ink-faint mt-1">
+                      {a.audit_id}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            );
+          })()}
         </Panel>
       </div>
 

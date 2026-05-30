@@ -117,10 +117,14 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
       <div>
         <label
           htmlFor="description"
-          className="block text-xs uppercase tracking-wide text-ink-faint mb-1"
+          className="block text-sm font-medium text-ink mb-1"
         >
-          Description · required
+          What&apos;s the issue?{" "}
+          <span className="text-ink-faint font-normal">· required</span>
         </label>
+        <p className="text-xs text-ink-muted mb-2">
+          In a sentence or two — what did the resident describe?
+        </p>
         <textarea
           id="description"
           name="description"
@@ -134,47 +138,55 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
               ? "border-[color:var(--color-decision-stop)]"
               : "border-border",
           ].join(" ")}
-          placeholder="What is the issue? What did the citizen describe?"
+          placeholder="e.g. There is graffiti on the stop sign at Wychwood and Tyrrel."
         />
         {invalid.has("description") && (
           <p id="err-description" className="text-xs text-[color:var(--color-decision-stop)] mt-1">
-            Required — minimum 3 characters.
+            Please write at least a few words.
           </p>
         )}
       </div>
 
-      <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <legend className="text-xs uppercase tracking-wide text-ink-faint mb-1 col-span-full">
-          Location
+      <fieldset>
+        <legend className="text-sm font-medium text-ink mb-1">
+          Where did it happen?
         </legend>
-        <Field
-          name="location_raw_text"
-          label="raw_text · required"
-          defaultValue={defaults.location_raw_text}
-          invalid={invalid.has("location.raw_text")}
-          className="col-span-full"
-        />
-        <Field
-          name="intersection_street_1"
-          label="intersection_street_1"
-          defaultValue={defaults.intersection_street_1}
-        />
-        <Field
-          name="intersection_street_2"
-          label="intersection_street_2"
-          defaultValue={defaults.intersection_street_2}
-        />
-        <Field
-          name="postal_code_or_fsa"
-          label="postal_code_or_fsa"
-          defaultValue={defaults.postal_code_or_fsa}
-        />
-        <Field name="ward" label="ward" defaultValue={defaults.ward} />
+        <p className="text-xs text-ink-muted mb-2">
+          A nearby intersection, postal area, or ward — anything specific
+          enough for a crew to find it.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Field
+            name="location_raw_text"
+            label="What the resident said"
+            hint="required · their own wording is fine"
+            defaultValue={defaults.location_raw_text}
+            invalid={invalid.has("location.raw_text")}
+            className="col-span-full"
+          />
+          <Field
+            name="intersection_street_1"
+            label="Nearest street"
+            defaultValue={defaults.intersection_street_1}
+          />
+          <Field
+            name="intersection_street_2"
+            label="Cross street"
+            defaultValue={defaults.intersection_street_2}
+          />
+          <Field
+            name="postal_code_or_fsa"
+            label="Postal area (FSA)"
+            defaultValue={defaults.postal_code_or_fsa}
+          />
+          <Field name="ward" label="Ward" defaultValue={defaults.ward} />
+        </div>
       </fieldset>
 
       <Field
         name="observed_at"
-        label="observed_at · required"
+        label="When did the resident notice it?"
+        hint="required"
         type="datetime-local"
         defaultValue={defaults.observed_at}
         invalid={invalid.has("observed_at")}
@@ -205,6 +217,7 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
 function Field({
   name,
   label,
+  hint,
   defaultValue,
   invalid,
   type = "text",
@@ -212,6 +225,7 @@ function Field({
 }: {
   name: string;
   label: string;
+  hint?: string;
   defaultValue?: string;
   invalid?: boolean;
   type?: string;
@@ -222,9 +236,12 @@ function Field({
     <div className={className}>
       <label
         htmlFor={id}
-        className="block text-xs uppercase tracking-wide text-ink-faint mb-1"
+        className="block text-sm font-medium text-ink mb-1"
       >
         {label}
+        {hint && (
+          <span className="text-ink-faint font-normal"> · {hint}</span>
+        )}
       </label>
       <input
         id={id}

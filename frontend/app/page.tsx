@@ -12,6 +12,7 @@ import { DecisionChip, HardRouteBadge } from "./_components/DecisionChip";
 import { EmptyState } from "./_components/EmptyState";
 import { ArrowRight } from "lucide-react";
 import type { CanonicalTicket, EvidencePack } from "./_server/types";
+import { columnLabels, translateFiringReason } from "./_lib/translations";
 
 type Row = {
   ticket_id: string;
@@ -37,13 +38,13 @@ export default async function DashboardPage() {
   const columns: Column<Row>[] = [
     {
       key: "ticket_id",
-      header: "ticket_id",
+      header: columnLabels.ticket_id,
       cell: (r) => <span className="font-mono">{r.ticket_id}</span>,
       width: "8rem",
     },
     {
       key: "reported_at",
-      header: "reported_at",
+      header: columnLabels.reported_at,
       cell: (r) => (
         <span className="font-mono text-xs text-ink-muted">{r.reported_at}</span>
       ),
@@ -51,7 +52,7 @@ export default async function DashboardPage() {
     },
     {
       key: "description",
-      header: "description",
+      header: columnLabels.description,
       cell: (r) => (
         <span className="text-ink line-clamp-1" title={r.description}>
           {r.description}
@@ -60,7 +61,7 @@ export default async function DashboardPage() {
     },
     {
       key: "category",
-      header: "category",
+      header: columnLabels.category,
       cell: (r) =>
         r.evidence ? (
           <DecisionChip
@@ -74,7 +75,7 @@ export default async function DashboardPage() {
     },
     {
       key: "duplicate",
-      header: "duplicate",
+      header: columnLabels.duplicate,
       cell: (r) =>
         r.evidence ? (
           <DecisionChip
@@ -86,10 +87,10 @@ export default async function DashboardPage() {
     },
     {
       key: "urgency",
-      header: "urgency",
+      header: columnLabels.urgency,
       cell: (r) =>
         r.evidence ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 items-start">
             <DecisionChip
               signal="urgency"
               value={r.evidence.urgency_decision}
@@ -103,7 +104,7 @@ export default async function DashboardPage() {
     },
     {
       key: "route",
-      header: "route",
+      header: columnLabels.route,
       cell: (r) =>
         r.evidence ? (
           <DecisionChip signal="route" value={r.evidence.route} size="sm" />
@@ -131,7 +132,7 @@ export default async function DashboardPage() {
             />
           </div>
         }
-        intro="Recent triage decisions and the queue of items needing human action. Every score and decision shown on this surface is computed in the backend; the agent explains, it never decides."
+        intro="The most recent requests and what needs your attention. Click a row to see what the system found and decide what to do next."
       />
 
       <Panel
@@ -187,8 +188,8 @@ export default async function DashboardPage() {
                       value={a.evidence.urgency_decision}
                       size="sm"
                     />
-                    <span className="text-[11px] font-mono text-ink-faint truncate max-w-[260px]">
-                      {a.firing_reason}
+                    <span className="text-[11px] text-ink-faint truncate max-w-[280px]" title={a.firing_reason}>
+                      {translateFiringReason(a.firing_reason)}
                     </span>
                   </div>
                 </li>

@@ -39,11 +39,17 @@ export async function getCanonicalTickets(): Promise<CanonicalTicket[]> {
 export async function getTicket(
   ticket_id: string,
 ): Promise<CanonicalTicket | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("fixtures", "tickets", `ticket:${ticket_id}`);
   const all = await getCanonicalTickets();
   return all.find((t) => t.ticket_id === ticket_id) ?? null;
 }
 
 export async function getRecentTickets(limit = 20): Promise<CanonicalTicket[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("fixtures", "tickets");
   const all = await getCanonicalTickets();
   return [...all]
     .sort((a, b) => (a.reported_at < b.reported_at ? 1 : -1))
@@ -60,6 +66,9 @@ export async function getEvidencePacks(): Promise<EvidencePack[]> {
 export async function getEvidencePack(
   ticket_id: string,
 ): Promise<EvidencePack | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("fixtures", "evidence", `ticket:${ticket_id}`);
   const all = await getEvidencePacks();
   return all.find((e) => e.ticket_id === ticket_id) ?? null;
 }
