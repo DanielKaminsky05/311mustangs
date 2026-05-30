@@ -1,0 +1,43 @@
+# Custom NemoClaw policy preset for the OpenClaw intake agent.
+#
+# Scope: lets the sandbox POST structured tickets and outbound reply text
+# back to the laptop's FastAPI on :8000. Without this, the local-inference
+# preset only allows host.openshell.internal — every call to the backend
+# is blocked by default.
+#
+# Install (on the GX10):
+#   scp policies/laptop-backend.yaml asus@<gx10>:/tmp/laptop-backend.yaml
+#   sudo mv /tmp/laptop-backend.yaml \
+#     ~/.nemoclaw/blueprints/openclaw/policies/presets/laptop-backend.yaml
+#   nemoclaw <name> policy-add --preset laptop-backend
+#   nemoclaw <name> policy-list   # confirm it shows applied
+#
+# When the laptop's Tailscale IP changes, edit the host: line and re-apply.
+
+preset:
+  name: laptop-backend
+  description: "311mustangs backend webhook + reply relay on the dev laptop"
+
+network_policies:
+  laptop_backend:
+    name: laptop_backend
+    endpoints:
+      # Laptop Tailscale IP (CGNAT range). Update if it changes.
+      - host: 100.99.93.61
+        port: 8000
+        protocol: rest
+        enforcement: enforce
+        allowed_ips:
+          # Tailscale CGNAT range. The default SSRF guard only whitelists
+          # RFC1918 (10/8, 172.16/12, 192.168/16); without this entry the
+          # request is dropped before the rule match even runs.
+          - 100.64.0.0/10
+        rules:
+          - allow: { method: POST, path: "/api/v1/webhooks/whatsapp/ticket-submissions" }
+          - allow: { method: POST, path: "/api/v1/intake/replies/**" }
+    binaries:
+      - { path: /usr/bin/curl }
+      - { path: /usr/local/bin/node }
+      - { path: /usr/bin/node }
+      - { path: /usr/bin/python3 }
+      - { path: /usr/local/bin/openclaw }

@@ -13,6 +13,17 @@ class Settings(BaseSettings):
     cors_origins: list[str] = []
     secret_key: str = "change-me"
 
+    # Twilio (host-side edge — these creds never enter the NemoClaw sandbox)
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_whatsapp_from: str = ""        # e.g. "whatsapp:+14155238886"
+    twilio_validate_signature: bool = False  # off behind dev tunnels; on in prod
+
+    # NemoClaw / OpenClaw intake agent
+    intake_agent_secret: str = ""         # HMAC key for the structured ticket webhook
+    sandbox_message_url: str = ""         # POST URL on the GX10 sandbox for inbound messages
+    sender_hash_salt: str = "change-me-salt"  # salts the sha256 of Twilio's `From` field
+
 
 @lru_cache
 def get_settings() -> Settings:
