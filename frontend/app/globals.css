@@ -2,27 +2,37 @@
 
 :root {
   /* Toronto.ca civic palette — captured from live site computed styles */
-  --color-civic-blue: #165788;       /* brand bar, links, headings */
-  --color-civic-blue-deep: #0f4a75;  /* hover / pressed / sub-nav */
-  --color-civic-blue-dark: #0a3b60;  /* footer / deepest chrome */
-  --color-civic-blue-soft: #e4ecf2;  /* selected row tint */
-  --color-civic-amber: #ec9f09;      /* primary CTA — used sparingly */
+  --color-civic-blue: #165788;
+  --color-civic-blue-deep: #0f4a75;
+  --color-civic-blue-dark: #0a3b60;
+  --color-civic-blue-soft: #e4ecf2;
+  --color-civic-amber: #ec9f09;
   --color-civic-amber-hover: #d18d05;
 
-  --color-ink: #000000;              /* body text — pure black on Toronto.ca */
-  --color-ink-muted: #333333;        /* secondary / table meta */
-  --color-ink-faint: #6b6b6b;        /* timestamps / hints */
+  --color-ink: #000000;
+  --color-ink-muted: #333333;
+  --color-ink-faint: #6b6b6b;
   --color-surface: #ffffff;
-  --color-surface-alt: #f8f8f8;      /* zebra rows, breadcrumb strip, callout */
+  --color-surface-alt: #f8f8f8;
   --color-border: #dddddd;
   --color-border-strong: #bfbfbf;
 
-  /* Semantic — only for decision/status chips and bars */
   --color-decision-ok: #1f7a45;
   --color-decision-warn: #b8590a;
   --color-decision-stop: #b0263c;
   --color-decision-neutral: #4a5763;
-  --color-accent-spark: #76b900;     /* NVIDIA green; ONLY in Spark status strip */
+  --color-accent-spark: #76b900;
+
+  /* Resolved font stacks. The next/font CSS variables (--font-text /
+   * --font-display / --font-mono) are injected by Next on <html>; these
+   * `--font-stack-*` aliases bake in fallbacks so a single var() lookup
+   * always resolves to a usable family, even before the webfont arrives. */
+  --font-stack-text: var(--font-text), Roboto, "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  --font-stack-display: var(--font-display), var(--font-text), Roboto,
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-stack-mono: var(--font-mono), ui-monospace, "SF Mono", Menlo,
+    Consolas, monospace;
 }
 
 @theme inline {
@@ -46,23 +56,27 @@
   --color-decision-neutral: var(--color-decision-neutral);
   --color-accent-spark: var(--color-accent-spark);
 
-  --font-text: var(--font-text);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
+  /* Tailwind v4 font utilities — anchor them on the resolved stacks so the
+   * `font-display` / `font-mono` classes always produce a real family. */
+  --font-text: var(--font-stack-text);
+  --font-display: var(--font-stack-display);
+  --font-mono: var(--font-stack-mono);
 }
 
 html,
 body {
   background: var(--color-surface);
   color: var(--color-ink);
-  font-family: var(--font-text), Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-stack-text);
   font-size: 16px;
   line-height: 1.5;
 }
 
 a {
   color: var(--color-civic-blue);
-  text-decoration: underline;
+  /* No global underline — text links opt in via Tailwind `underline`. Chrome
+   * links (nav rail, brand wordmark, decision chips) stay clean by default
+   * instead of fighting `no-underline` overrides. */
   text-underline-offset: 2px;
 }
 a:hover {
@@ -73,8 +87,16 @@ h1,
 h2,
 h3 {
   font-weight: 500; /* Toronto.ca signature: medium-weight headings, never bold */
-  color: var(--color-ink); /* Toronto page H1s are pure black, not brand blue */
+  color: var(--color-ink);
   letter-spacing: -0.01em;
+}
+
+.font-brand {
+  /* Display-weight family for the TORONTO wordmark — explicit so the
+   * brand bar never falls back to a thin system font on slow loads. */
+  font-family: var(--font-stack-display);
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
 *:focus-visible {

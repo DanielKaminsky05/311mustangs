@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   getApprovalsQueue,
   getEvidencePacks,
@@ -119,19 +118,6 @@ export default async function DashboardPage() {
       <PageHeader
         title="Operator dashboard"
         actions={<PageUtilityButtons />}
-        hero={
-          <div className="overflow-hidden rounded-[3px] border border-border">
-            <Image
-              src="/toronto-hero.jpg"
-              alt="Nathan Phillips Square with the Toronto sign"
-              width={1680}
-              height={440}
-              priority
-              className="w-full h-auto block"
-              sizes="(min-width: 1280px) 1280px, 100vw"
-            />
-          </div>
-        }
         intro="The most recent requests and what needs your attention. Click a row to see what the system found and decide what to do next."
       />
 

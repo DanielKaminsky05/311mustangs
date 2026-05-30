@@ -12,10 +12,10 @@ export function CivicHeader({ rightSlot }: { rightSlot?: ReactNode } = {}) {
         <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 h-[84px] flex items-center gap-4">
           <Link
             href="/"
-            className="flex items-center gap-3 no-underline text-white hover:text-white"
+            className="flex items-center gap-3 text-white hover:text-white"
           >
             <SkylineGlyph />
-            <span className="font-display text-3xl font-medium tracking-wide leading-none">
+            <span className="font-brand text-[34px] leading-none">
               TORONTO
             </span>
           </Link>
