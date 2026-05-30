@@ -1,6 +1,5 @@
 # Resolution Engine Planning Notes
 
-
 ## Context 
 
 The 311 service is fundamentally bottlenecked by the fact that humans need to review a massive incoming stream of service requests and go through a bueraucratic process to be able to deploy actual operations to resolve this. This creates 2 problems:
