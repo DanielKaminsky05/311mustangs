@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { getOperations, getScheduleAssignments } from "../_server/data";
 import { Panel, PageHeader } from "../_components/Panel";
 import { PageUtilityButtons } from "../_components/PageUtilityButtons";
 import { Breadcrumbs } from "../_components/Breadcrumbs";
 import { columnLabels } from "../_lib/translations";
+import { formatTimestamp } from "../_lib/format";
 import { DataTable, type Column } from "../_components/DataTable";
 import { EmptyState } from "../_components/EmptyState";
 import type { Operation, ScheduleAssignment } from "../_server/types";
@@ -51,7 +53,9 @@ export default async function SchedulePage() {
       key: "scheduled_for",
       header: columnLabels.scheduled_for,
       cell: (o) => (
-        <span className="font-mono text-xs">{o.scheduled_for}</span>
+        <span className="text-xs tabular-nums" title={o.scheduled_for}>
+          {formatTimestamp(o.scheduled_for)}
+        </span>
       ),
     },
   ];
@@ -61,12 +65,12 @@ export default async function SchedulePage() {
       key: "ticket_id",
       header: columnLabels.ticket_id,
       cell: (a) => (
-        <a
+        <Link
           href={`/requests/${a.ticket_id}`}
-          className="font-mono text-civic-blue hover:text-civic-blue-deep"
+          className="font-mono text-civic-blue hover:text-civic-blue-deep no-underline"
         >
           {a.ticket_id}
-        </a>
+        </Link>
       ),
       width: "8rem",
     },
@@ -75,7 +79,9 @@ export default async function SchedulePage() {
       key: "proposed_slot",
       header: columnLabels.proposed_slot,
       cell: (a) => (
-        <span className="font-mono text-xs">{a.proposed_slot}</span>
+        <span className="text-xs tabular-nums" title={a.proposed_slot}>
+          {formatTimestamp(a.proposed_slot)}
+        </span>
       ),
     },
     {

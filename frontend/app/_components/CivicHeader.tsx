@@ -13,6 +13,7 @@ export function CivicHeader({ rightSlot }: { rightSlot?: ReactNode } = {}) {
           <Link
             href="/"
             className="flex items-center gap-3 text-white hover:text-white"
+            translate="no"
           >
             <SkylineGlyph />
             <span className="font-brand text-[34px] leading-none">
@@ -22,16 +23,26 @@ export function CivicHeader({ rightSlot }: { rightSlot?: ReactNode } = {}) {
 
           <div className="hidden md:flex flex-1 items-center justify-center gap-2">
             <div className="flex items-center w-full max-w-md">
-              <div className="flex-1 h-9 px-3 bg-white text-ink rounded-l-[3px] text-sm flex items-center justify-between border border-white">
-                <span className="text-ink-faint">Search</span>
-                <span className="text-ink-faint text-xs font-mono">⌘K</span>
-              </div>
+              <input
+                type="search"
+                name="q"
+                aria-label="Search"
+                placeholder="Search…"
+                disabled
+                title="Search isn’t wired up in the demo"
+                className="flex-1 h-9 px-3 bg-white text-ink placeholder:text-ink-faint rounded-l-[3px] text-sm border border-white focus:outline-none disabled:cursor-not-allowed"
+              />
               <button
                 type="button"
-                className="h-9 px-3 bg-civic-blue-deep text-white text-sm rounded-r-[3px] border border-white border-l-0 hover:bg-civic-blue-dark"
-                aria-label="Search"
+                disabled
+                title="Search isn’t wired up in the demo"
+                className="h-9 px-3 bg-civic-blue-deep text-white text-sm rounded-r-[3px] border border-white border-l-0 hover:bg-civic-blue-dark disabled:cursor-not-allowed disabled:opacity-80 inline-flex items-center gap-1"
+                aria-label="Submit search"
               >
                 Search
+                <span className="text-xs font-mono text-white/70">
+                  ⌘&nbsp;K
+                </span>
               </button>
             </div>
             <div className="hidden lg:flex items-center gap-px ml-1">

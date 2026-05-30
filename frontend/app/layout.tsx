@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto, JetBrains_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
@@ -32,6 +32,11 @@ export const metadata: Metadata = {
     "Toronto 311 resolution engine — operator dashboard for the DGX Spark triage pipeline.",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#002347",
+  colorScheme: "light",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -41,6 +46,12 @@ export default function RootLayout({
       className={`${roboto.variable} ${robotoDisplay.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface text-ink">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:bg-civic-blue focus:text-white focus:rounded-[3px] focus:underline"
+        >
+          Skip to main content
+        </a>
         <CivicHeader
           rightSlot={
             <Suspense fallback={<SystemStatusSkeleton />}>
@@ -51,8 +62,8 @@ export default function RootLayout({
         <Suspense fallback={<SubNavSkeleton />}>
           <SubNav />
         </Suspense>
-        <main className="flex-1 min-w-0">
-          <div className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8">
+        <main id="main" className="flex-1 min-w-0">
+          <div className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
             {children}
           </div>
         </main>

@@ -36,8 +36,8 @@ export function SafetyAnswersGridForm({
         Safety questions · all required
       </legend>
       <p className="text-xs text-ink-muted mb-2">
-        Answer based on what the citizen actually said. &quot;Not sure&quot; is
-        fine — never guess on a safety question.
+        Answer based on what the citizen actually said. “Not sure” is fine
+        — never guess on a safety question.
       </p>
       {SAFETY_KEYS.map((key) => {
         const dflt = defaults?.[key];

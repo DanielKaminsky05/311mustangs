@@ -7,6 +7,7 @@ import { EmptyState } from "../_components/EmptyState";
 import { ApprovalActions } from "./ApprovalActions";
 import Link from "next/link";
 import { translateFiringReason } from "../_lib/translations";
+import { formatPercent, formatTimestamp, pluralize } from "../_lib/format";
 
 export const metadata = { title: "Approvals · 311 Mustangs" };
 
@@ -22,7 +23,7 @@ export default async function ApprovalsPage() {
         intro="Requests the system flagged for you to look at — usually because of a safety issue, a medium-urgency call, or because the category was unclear. Approving sends the request to the suggested next step; you can override or hand it off."
       />
 
-      <Panel title={`${queue.length} item${queue.length === 1 ? "" : "s"}`}>
+      <Panel title={`${queue.length} ${pluralize(queue.length, "item")}`}>
         {queue.length === 0 ? (
           <EmptyState title="Queue is empty." />
         ) : (
@@ -43,8 +44,12 @@ export default async function ApprovalsPage() {
                     <p className="text-sm text-ink mt-0.5 truncate max-w-prose">
                       {row.ticket.description}
                     </p>
-                    <p className="text-[11px] font-mono text-ink-faint mt-1">
-                      reported_at {row.ticket.reported_at} · status{" "}
+                    <p className="text-[11px] text-ink-faint mt-1 tabular-nums">
+                      Reported{" "}
+                      <span title={row.ticket.reported_at}>
+                        {formatTimestamp(row.ticket.reported_at)}
+                      </span>{" "}
+                      · status{" "}
                       <span
                         className={
                           row.status === "pending"
@@ -83,12 +88,12 @@ export default async function ApprovalsPage() {
                     </p>
                     <p className="text-ink mt-0.5">
                       {row.evidence.category_candidates[0]?.service_request_type}{" "}
-                      <span className="text-ink-faint font-mono">
-                        ({Math.round(
-                          (row.evidence.category_candidates[0]?.confidence ??
-                            0) * 100,
-                        )}
-                        % confidence)
+                      <span className="text-ink-faint tabular-nums">
+                        (
+                        {formatPercent(
+                          row.evidence.category_candidates[0]?.confidence ?? 0,
+                        )}{" "}
+                        confidence)
                       </span>
                     </p>
                   </div>
@@ -105,7 +110,10 @@ export default async function ApprovalsPage() {
                           : row.status === "overridden"
                             ? "Category overridden"
                             : "Sent to a human reviewer"}{" "}
-                        by {row.decided_by} · {row.decided_at}
+                        by {row.decided_by} ·{" "}
+                        <span title={row.decided_at ?? undefined}>
+                          {formatTimestamp(row.decided_at)}
+                        </span>
                       </p>
                     )}
                   </div>

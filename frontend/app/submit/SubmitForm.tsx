@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { submitRequest, type SubmitState } from "../_actions/submitRequest";
 import type { DemoCase, SafetyAnswers } from "../_server/types";
 import { SafetyAnswersGridForm } from "../_components/HazardFlagGrid";
 import { UploadZone } from "../_components/UploadZone";
 import { Send, AlertOctagon } from "lucide-react";
 import { Button } from "../_components/Button";
+import { nowForDatetimeLocalInput } from "../_lib/format";
 
 type FormDefaults = {
   case_id: string;
@@ -20,9 +21,7 @@ type FormDefaults = {
   safety_answers: Partial<SafetyAnswers>;
 };
 
-const DEFAULT_CLOCK = "2026-01-15T20:00";
-
-const EMPTY: FormDefaults = {
+const EMPTY_DEFAULTS = (observed_at: string): FormDefaults => ({
   case_id: "",
   description: "",
   location_raw_text: "",
@@ -30,9 +29,9 @@ const EMPTY: FormDefaults = {
   intersection_street_2: "",
   postal_code_or_fsa: "",
   ward: "",
-  observed_at: DEFAULT_CLOCK,
+  observed_at,
   safety_answers: {},
-};
+});
 
 function demoToDefaults(c: DemoCase): FormDefaults {
   return {
@@ -51,7 +50,20 @@ function demoToDefaults(c: DemoCase): FormDefaults {
 }
 
 export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
-  const [defaults, setDefaults] = useState<FormDefaults>(EMPTY);
+  // Initial render must match between server and client — use a stable seed
+  // and hydrate the real "now" timestamp in an effect after mount.
+  const [defaults, setDefaults] = useState<FormDefaults>(() =>
+    EMPTY_DEFAULTS(""),
+  );
+  useEffect(() => {
+    setDefaults((d) =>
+      d.case_id || d.observed_at ? d : EMPTY_DEFAULTS(nowForDatetimeLocalInput()),
+    );
+  }, []);
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const [dirty, setDirty] = useState(false);
+
   const [state, formAction, pending] = useActionState<SubmitState, FormData>(
     submitRequest,
     {},
@@ -61,12 +73,34 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
     [state.NEEDS_MORE_INFO],
   );
 
+  // Focus the first invalid field whenever a new NEEDS_MORE_INFO comes back.
+  useEffect(() => {
+    if (invalid.size === 0 || !formRef.current) return;
+    const first = formRef.current.querySelector<HTMLElement>(
+      '[aria-invalid="true"]',
+    );
+    first?.focus();
+    first?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [invalid]);
+
+  // Warn before navigating away with unsaved input.
+  useEffect(() => {
+    if (!dirty || pending) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty, pending]);
+
   return (
     <form
+      ref={formRef}
       // Form key forces full re-mount when a demo case is loaded so all the
       // defaultValue inputs pick up new values without controlled state.
       key={defaults.case_id || "empty"}
       action={formAction}
+      onInput={() => setDirty(true)}
       className="flex flex-col gap-6"
     >
       <input type="hidden" name="case_id" defaultValue={defaults.case_id} />
@@ -80,11 +114,18 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
         </label>
         <select
           id="demo-case"
-          className="text-sm border border-border rounded-[3px] px-2 py-1 bg-surface"
+          className="text-sm border border-border rounded-[3px] px-2 py-1 bg-surface text-ink"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            color: "var(--color-ink)",
+          }}
           defaultValue=""
           onChange={(e) => {
             const c = demoCases.find((d) => d.case_id === e.target.value);
-            setDefaults(c ? demoToDefaults(c) : EMPTY);
+            setDefaults(
+              c ? demoToDefaults(c) : EMPTY_DEFAULTS(nowForDatetimeLocalInput()),
+            );
+            setDirty(false);
           }}
         >
           <option value="">— pick a scripted case —</option>
@@ -104,12 +145,15 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
       {invalid.size > 0 && (
         <div
           role="alert"
+          aria-live="polite"
           className="flex items-start gap-2 px-3 py-2 border border-[color:var(--color-decision-warn)]/40 bg-[color:var(--color-decision-warn)]/10 text-[color:var(--color-decision-warn)] rounded-[3px] text-sm"
         >
           <AlertOctagon size={14} className="mt-0.5 shrink-0" aria-hidden />
           <div>
             <p className="font-medium">Please complete the highlighted fields</p>
-            <p className="font-mono text-xs">missing: {[...invalid].join(", ")}</p>
+            <p className="text-xs">
+              Missing: {[...invalid].map(humanizeField).join(", ")}.
+            </p>
           </div>
         </div>
       )}
@@ -119,7 +163,7 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
           htmlFor="description"
           className="block text-sm font-medium text-ink mb-1"
         >
-          What&apos;s the issue?{" "}
+          What’s the issue?{" "}
           <span className="text-ink-faint font-normal">· required</span>
         </label>
         <p className="text-xs text-ink-muted mb-2">
@@ -130,18 +174,24 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
           name="description"
           rows={3}
           defaultValue={defaults.description}
+          autoComplete="off"
           aria-invalid={invalid.has("description") || undefined}
-          aria-describedby={invalid.has("description") ? "err-description" : undefined}
+          aria-describedby={
+            invalid.has("description") ? "err-description" : undefined
+          }
           className={[
             "w-full border rounded-[3px] px-3 py-2 text-sm bg-surface text-ink",
             invalid.has("description")
               ? "border-[color:var(--color-decision-stop)]"
               : "border-border",
           ].join(" ")}
-          placeholder="e.g. There is graffiti on the stop sign at Wychwood and Tyrrel."
+          placeholder="e.g. There is graffiti on the stop sign at Wychwood and Tyrrel…"
         />
         {invalid.has("description") && (
-          <p id="err-description" className="text-xs text-[color:var(--color-decision-stop)] mt-1">
+          <p
+            id="err-description"
+            className="text-xs text-[color:var(--color-decision-stop)] mt-1"
+          >
             Please write at least a few words.
           </p>
         )}
@@ -162,24 +212,40 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
             hint="required · their own wording is fine"
             defaultValue={defaults.location_raw_text}
             invalid={invalid.has("location.raw_text")}
+            placeholder="e.g. by the bus stop on Wychwood near Tyrrel…"
+            autoComplete="off"
             className="col-span-full"
           />
           <Field
             name="intersection_street_1"
             label="Nearest street"
             defaultValue={defaults.intersection_street_1}
+            placeholder="e.g. Wychwood Ave"
+            autoComplete="address-line1"
           />
           <Field
             name="intersection_street_2"
             label="Cross street"
             defaultValue={defaults.intersection_street_2}
+            placeholder="e.g. Tyrrel Ave"
+            autoComplete="address-line2"
           />
           <Field
             name="postal_code_or_fsa"
             label="Postal area (FSA)"
             defaultValue={defaults.postal_code_or_fsa}
+            placeholder="e.g. M6G"
+            autoComplete="postal-code"
+            inputMode="text"
+            spellCheck={false}
           />
-          <Field name="ward" label="Ward" defaultValue={defaults.ward} />
+          <Field
+            name="ward"
+            label="Ward"
+            defaultValue={defaults.ward}
+            placeholder="e.g. Toronto-St. Paul’s (12)"
+            autoComplete="off"
+          />
         </div>
       </fieldset>
 
@@ -190,6 +256,7 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
         type="datetime-local"
         defaultValue={defaults.observed_at}
         invalid={invalid.has("observed_at")}
+        autoComplete="off"
       />
 
       <SafetyAnswersGridForm
@@ -214,6 +281,22 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
   );
 }
 
+const FIELD_LABEL: Record<string, string> = {
+  description: "Description",
+  "location.raw_text": "Location",
+  observed_at: "When seen",
+  "safety_answers.injury": "Injury",
+  "safety_answers.active_danger": "Active danger",
+  "safety_answers.blocking_road": "Blocking road",
+  "safety_answers.blocking_sidewalk": "Blocking sidewalk",
+  "safety_answers.flooding": "Flooding",
+  "safety_answers.sewage_or_water_issue": "Sewage / water",
+  "safety_answers.traffic_signal_issue": "Traffic signal",
+};
+function humanizeField(key: string): string {
+  return FIELD_LABEL[key] ?? key;
+}
+
 function Field({
   name,
   label,
@@ -222,6 +305,10 @@ function Field({
   invalid,
   type = "text",
   className,
+  placeholder,
+  autoComplete,
+  inputMode,
+  spellCheck,
 }: {
   name: string;
   label: string;
@@ -230,14 +317,15 @@ function Field({
   invalid?: boolean;
   type?: string;
   className?: string;
+  placeholder?: string;
+  autoComplete?: string;
+  inputMode?: "text" | "numeric" | "tel" | "search" | "email" | "url";
+  spellCheck?: boolean;
 }) {
   const id = `f-${name}`;
   return (
     <div className={className}>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-ink mb-1"
-      >
+      <label htmlFor={id} className="block text-sm font-medium text-ink mb-1">
         {label}
         {hint && (
           <span className="text-ink-faint font-normal"> · {hint}</span>
@@ -249,6 +337,10 @@ function Field({
         type={type}
         defaultValue={defaultValue}
         aria-invalid={invalid || undefined}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        spellCheck={spellCheck}
+        placeholder={placeholder}
         className={[
           "w-full border rounded-[3px] px-3 py-2 text-sm bg-surface text-ink",
           invalid

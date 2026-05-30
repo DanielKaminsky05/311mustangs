@@ -12,6 +12,7 @@ import { EmptyState } from "./_components/EmptyState";
 import { ArrowRight } from "lucide-react";
 import type { CanonicalTicket, EvidencePack } from "./_server/types";
 import { columnLabels, translateFiringReason } from "./_lib/translations";
+import { formatTimestamp, pluralize } from "./_lib/format";
 
 type Row = {
   ticket_id: string;
@@ -45,7 +46,12 @@ export default async function DashboardPage() {
       key: "reported_at",
       header: columnLabels.reported_at,
       cell: (r) => (
-        <span className="font-mono text-xs text-ink-muted">{r.reported_at}</span>
+        <span
+          className="text-xs text-ink-muted tabular-nums"
+          title={r.reported_at}
+        >
+          {formatTimestamp(r.reported_at)}
+        </span>
       ),
       width: "14rem",
     },
@@ -135,7 +141,7 @@ export default async function DashboardPage() {
 
       <Panel
         title="Pending operator action"
-        subtitle={`${pendingCount} item${pendingCount === 1 ? "" : "s"} awaiting review.`}
+        subtitle={`${pendingCount} ${pluralize(pendingCount, "item")} awaiting review.`}
         actions={
           <Link
             href="/approvals"

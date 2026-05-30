@@ -19,6 +19,7 @@ import {
   routeLabels,
   urgencyLabels,
 } from "../../_lib/translations";
+import { formatPercent, formatTimestamp } from "../../_lib/format";
 import { DefinitionList } from "../../_components/DefinitionList";
 import { DecisionChip, HardRouteBadge } from "../../_components/DecisionChip";
 import { ConfidenceList } from "../../_components/ConfidenceList";
@@ -29,6 +30,16 @@ import { SafetyAnswersReadout } from "../../_components/HazardFlagGrid";
 import { AttachmentTile } from "../../_components/AttachmentTile";
 import { EmptyState } from "../../_components/EmptyState";
 import { CopilotChatPanel } from "./CopilotChatPanel";
+
+const STAGE_LABEL: Record<string, string> = {
+  validation: "Checked the request",
+  structured_text: "Built the text to search",
+  category_inference: "Picked the best category",
+  historical_similarity: "Found past similar requests",
+  duplicate_retrieval: "Looked for open duplicates",
+  urgency_scoring: "Scored the urgency",
+  routing: "Decided where to send it",
+};
 
 export async function generateStaticParams() {
   const tickets = await getCanonicalTickets();
@@ -84,8 +95,10 @@ export default async function TriagePage(props: {
         intro={
           <span className="text-sm text-ink-muted">
             Reported{" "}
-            <span className="font-mono">{ticket.reported_at}</span> via{" "}
-            <span className="font-medium">{ticket.source}</span>
+            <span className="tabular-nums" title={ticket.reported_at}>
+              {formatTimestamp(ticket.reported_at)}
+            </span>{" "}
+            via <span className="font-medium">{ticket.source}</span>
           </span>
         }
       />
@@ -168,7 +181,11 @@ export default async function TriagePage(props: {
           </dl>
         </Panel>
 
-        <Panel id="submitted" title="What the citizen said">
+        <Panel
+          id="submitted"
+          title="What the citizen said"
+          className="scroll-mt-24"
+        >
           <div className="flex flex-col gap-4">
             <DefinitionList
               items={[
@@ -191,8 +208,14 @@ export default async function TriagePage(props: {
                 },
                 {
                   label: "When seen",
-                  value: ticket.observed_at,
-                  mono: true,
+                  value: (
+                    <span
+                      className="tabular-nums"
+                      title={ticket.observed_at}
+                    >
+                      {formatTimestamp(ticket.observed_at)}
+                    </span>
+                  ),
                 },
               ]}
             />
@@ -213,7 +236,7 @@ export default async function TriagePage(props: {
               {attachments.length === 0 ? (
                 <p className="text-sm text-ink-muted">No attachments.</p>
               ) : (
-                <ul className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {attachments.map((a) => (
                     <li key={a.attachment_id}>
                       <AttachmentTile
@@ -235,6 +258,7 @@ export default async function TriagePage(props: {
           id="category"
           title="Best matching categories"
           subtitle="What the system thinks this request is about, ranked by how well it matches."
+          className="scroll-mt-24"
         >
           <ConfidenceList
             candidates={evidence.category_candidates}
@@ -271,7 +295,11 @@ export default async function TriagePage(props: {
           </details>
         </Panel>
 
-        <Panel id="urgency" title="How urgent is it?">
+        <Panel
+          id="urgency"
+          title="How urgent is it?"
+          className="scroll-mt-24"
+        >
           {(() => {
             const urgencyStrength = describeStrength(evidence.urgency_score);
             return (
@@ -282,10 +310,10 @@ export default async function TriagePage(props: {
                       {urgencyLabels[evidence.urgency_decision].label}
                     </span>{" "}
                     <span
-                      className="text-sm text-ink-muted"
+                      className="text-sm text-ink-muted tabular-nums"
                       title={`urgency_score=${evidence.urgency_score.toFixed(2)}`}
                     >
-                      ({Math.round(evidence.urgency_score * 100)}% on the urgency scale)
+                      ({formatPercent(evidence.urgency_score)} on the urgency scale)
                     </span>
                   </p>
                   <p className="text-sm text-ink-muted mt-1">
@@ -326,6 +354,7 @@ export default async function TriagePage(props: {
           id="historical"
           title="Past similar requests"
           subtitle="Completed 311 requests that look like this one. Useful for context — how was this kind of thing handled before?"
+          className="scroll-mt-24"
         >
           {evidence.nearest_historical_records.length === 0 ? (
             <EmptyState title="No past requests look similar enough to show." />
@@ -343,6 +372,7 @@ export default async function TriagePage(props: {
         <Panel
           id="duplicates"
           title="Open requests that look like this one"
+          className="scroll-mt-24"
           subtitle={
             evidence.duplicate_decision === "NOT_DUPLICATE"
               ? "Nothing open looks like a duplicate."
@@ -353,9 +383,12 @@ export default async function TriagePage(props: {
             <EmptyState
               title="No likely duplicates"
               hint={
-                <span title={`duplicate_score=${evidence.duplicate_score.toFixed(2)}`}>
+                <span
+                  className="tabular-nums"
+                  title={`duplicate_score=${evidence.duplicate_score.toFixed(2)}`}
+                >
                   Duplicate confidence is only{" "}
-                  {Math.round(evidence.duplicate_score * 100)}% — below the
+                  {formatPercent(evidence.duplicate_score)} — below the
                   threshold to flag.
                 </span>
               }
@@ -375,31 +408,24 @@ export default async function TriagePage(props: {
           id="audit"
           title="What the system did, step by step"
           subtitle="Every decision can be traced back to one of these steps. Citations in the copilot answers link directly into this list."
+          className="scroll-mt-24"
         >
-          {(() => {
-            const STAGE_LABEL: Record<string, string> = {
-              validation: "Checked the request",
-              structured_text: "Built the text to search",
-              category_inference: "Picked the best category",
-              historical_similarity: "Found past similar requests",
-              duplicate_retrieval: "Looked for open duplicates",
-              urgency_scoring: "Scored the urgency",
-              routing: "Decided where to send it",
-            };
-            return (
-              <ol className="flex flex-col gap-2">
-                {audits.map((a) => (
-                  <li
-                    key={a.audit_id}
-                    id={a.audit_id}
-                    className="border border-border rounded-[3px] bg-surface-alt/30 px-3 py-2 scroll-mt-24 target:bg-civic-blue-soft target:border-civic-blue"
-                  >
+          <ol className="flex flex-col gap-2">
+            {audits.map((a) => (
+              <li
+                key={a.audit_id}
+                id={a.audit_id}
+                className="border border-border rounded-[3px] bg-surface-alt/30 px-3 py-2 scroll-mt-24 target:bg-civic-blue-soft target:border-civic-blue"
+              >
                     <div className="flex items-baseline justify-between gap-2">
                       <p className="text-sm font-medium text-ink">
                         {STAGE_LABEL[a.stage] ?? a.stage}
                       </p>
-                      <p className="text-[11px] font-mono text-ink-faint">
-                        {a.timestamp}
+                      <p
+                        className="text-[11px] text-ink-faint tabular-nums"
+                        title={a.timestamp}
+                      >
+                        {formatTimestamp(a.timestamp)}
                       </p>
                     </div>
                     <p className="text-sm text-ink mt-1">{a.summary}</p>
@@ -409,8 +435,6 @@ export default async function TriagePage(props: {
                   </li>
                 ))}
               </ol>
-            );
-          })()}
         </Panel>
       </div>
 

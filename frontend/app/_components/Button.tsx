@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 type Variant = "primary" | "amber" | "secondary" | "ghost" | "danger";
@@ -52,17 +53,24 @@ export function LinkButton({
   size?: "sm" | "md";
   href: string;
 }) {
+  const cls = [
+    "inline-flex items-center justify-center gap-2 font-medium rounded-[3px] no-underline transition-colors",
+    size === "sm" ? "h-7 px-2.5 text-xs" : "h-9 px-3 text-sm",
+    VARIANT[variant],
+    className ?? "",
+  ].join(" ");
+  // Internal routes use next/link for client navigation + prefetching;
+  // external URLs fall through to a plain anchor.
+  const isInternal = href.startsWith("/") && !href.startsWith("//");
+  if (isInternal) {
+    return (
+      <Link href={href} className={cls}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <a
-      href={href}
-      {...rest}
-      className={[
-        "inline-flex items-center justify-center gap-2 font-medium rounded-[3px] no-underline transition-colors",
-        size === "sm" ? "h-7 px-2.5 text-xs" : "h-9 px-3 text-sm",
-        VARIANT[variant],
-        className ?? "",
-      ].join(" ")}
-    >
+    <a href={href} {...rest} className={cls}>
       {children}
     </a>
   );

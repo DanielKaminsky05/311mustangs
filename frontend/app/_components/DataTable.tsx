@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 export type Column<T> = {
@@ -79,9 +80,12 @@ export function DataTable<T extends Record<string, unknown>>({
                     : (row as Record<string, ReactNode>)[c.key];
                   const inner =
                     href && c.key === columns[0].key ? (
-                      <a href={href} className="text-civic-blue hover:text-civic-blue-deep">
+                      <Link
+                        href={href}
+                        className="text-civic-blue hover:text-civic-blue-deep no-underline"
+                      >
                         {content}
-                      </a>
+                      </Link>
                     ) : (
                       content
                     );

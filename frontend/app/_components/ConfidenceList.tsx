@@ -1,5 +1,6 @@
 import type { CategoryCandidate } from "../_server/types";
 import { describeStrength } from "../_lib/translations";
+import { formatPercent } from "../_lib/format";
 
 export function ConfidenceList({
   candidates,
@@ -22,11 +23,11 @@ export function ConfidenceList({
         )}{" "}
         — <span className={strength.className}>{strength.band} match</span>{" "}
         <span
-          className="text-ink-faint text-xs font-mono"
+          className="text-ink-faint text-xs font-mono tabular-nums"
           title={`category_confidence=${confidence.toFixed(2)} · category_margin=${margin.toFixed(2)}`}
         >
-          ({Math.round(confidence * 100)}% confidence, runner-up{" "}
-          {Math.round((confidence - margin) * 100)}%)
+          ({formatPercent(confidence)} confidence, runner-up{" "}
+          {formatPercent(confidence - margin)})
         </span>
       </div>
       <ol className="flex flex-col gap-2">
@@ -58,15 +59,23 @@ export function ConfidenceList({
                   title={`confidence=${c.confidence.toFixed(2)} · similarity=${c.similarity.toFixed(2)}`}
                 >
                   <span className={s.className}>{s.band} match</span>{" "}
-                  <span className="text-ink-faint">
-                    · {Math.round(c.confidence * 100)}%
+                  <span className="text-ink-faint tabular-nums">
+                    · {formatPercent(c.confidence)}
                   </span>
                 </div>
               </div>
-              <div className="mt-2 h-1 bg-surface rounded-[3px] overflow-hidden border border-border">
+              <div
+                role="progressbar"
+                aria-label={`${c.service_request_type} confidence`}
+                aria-valuenow={c.confidence}
+                aria-valuemin={0}
+                aria-valuemax={1}
+                className="mt-2 h-1 bg-surface rounded-[3px] overflow-hidden border border-border"
+              >
                 <div
                   className="h-full bg-civic-blue"
                   style={{ width: `${pct}%` }}
+                  aria-hidden
                 />
               </div>
             </li>

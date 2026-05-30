@@ -57,7 +57,11 @@ export function CopilotChatPanel({
         <h2 className="text-sm font-medium tracking-tight">Ask about this request</h2>
       </header>
 
-      <div className="flex-1 max-h-[60vh] overflow-y-auto p-3 flex flex-col gap-3 text-sm">
+      <div
+        aria-live="polite"
+        aria-busy={pending}
+        className="flex-1 max-h-[60vh] overflow-y-auto p-3 flex flex-col gap-3 text-sm"
+      >
         {messages.length === 0 && (
           <p className="text-xs text-ink-muted">
             Type a question, or pick one below. Every answer cites the step
@@ -123,7 +127,9 @@ export function CopilotChatPanel({
           aria-label="Ask a question about this request"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about this request…"
+          placeholder="e.g. Why does this look like a duplicate?…"
+          autoComplete="off"
+          spellCheck={false}
           className="flex-1 bg-surface border border-border rounded-[3px] px-2 py-1 text-sm"
         />
         <button

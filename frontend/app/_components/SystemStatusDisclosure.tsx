@@ -93,8 +93,8 @@ export function SystemStatusDisclosure({
             </Row>
           </ul>
           <p className="px-3 py-2 text-[11px] text-ink-faint bg-surface-alt border-t border-border">
-            This panel is for admins and judges — operators don&apos;t need
-            it to do their work.
+            This panel is for admins and judges — operators don’t need it to
+            do their work.
           </p>
         </div>
       )}

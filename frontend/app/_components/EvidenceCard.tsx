@@ -1,5 +1,6 @@
 import type { NearestRecord } from "../_server/types";
 import { describeStrength } from "../_lib/translations";
+import { formatDateOnly, formatPercent } from "../_lib/format";
 
 export function EvidenceCard({ record }: { record: NearestRecord }) {
   const s = describeStrength(record.similarity);
@@ -22,10 +23,10 @@ export function EvidenceCard({ record }: { record: NearestRecord }) {
         </div>
         <div className="text-right text-xs">
           <p
-            className={s.className}
+            className={`${s.className} tabular-nums`}
             title={`similarity=${record.similarity.toFixed(2)}`}
           >
-            {s.band} match · {Math.round(record.similarity * 100)}%
+            {s.band} match · {formatPercent(record.similarity)}
           </p>
           <p className="text-ink-muted">{record.status}</p>
         </div>
@@ -45,7 +46,7 @@ export function EvidenceCard({ record }: { record: NearestRecord }) {
         </span>
         <span>
           First reported:{" "}
-          <span className="font-mono text-ink">{record.creation_date}</span>
+          <span className="text-ink">{formatDateOnly(record.creation_date)}</span>
         </span>
         {record.filter_match && (
           <span className="sm:col-span-2">

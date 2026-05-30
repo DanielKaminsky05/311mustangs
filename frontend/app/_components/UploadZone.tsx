@@ -73,7 +73,8 @@ export function UploadZone({
             </button>
           </p>
           <p className="text-xs text-ink-faint">
-            JPEG · PNG · WEBP · HEIC · PDF · up to 10 MB each · max 5 files
+            JPEG · PNG · WEBP · HEIC · PDF · up to 10&nbsp;MB each · max
+            5&nbsp;files
           </p>
           <input
             ref={inputRef}
@@ -88,6 +89,14 @@ export function UploadZone({
           />
         </div>
       </div>
+
+      <p className="sr-only" aria-live="polite">
+        {pending
+          ? "Uploading attachment…"
+          : attachments.length > 0
+            ? `${attachments.length} attachment${attachments.length === 1 ? "" : "s"} ready`
+            : ""}
+      </p>
 
       {attachments.length > 0 && (
         <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -113,10 +122,17 @@ export function UploadZone({
       )}
 
       {rejections.length > 0 && (
-        <ul className="text-xs text-[color:var(--color-decision-stop)] border border-[color:var(--color-decision-stop)]/40 bg-[color:var(--color-decision-stop)]/10 rounded-sm px-3 py-2">
+        <ul
+          role="alert"
+          aria-live="polite"
+          className="text-xs text-[color:var(--color-decision-stop)] border border-[color:var(--color-decision-stop)]/40 bg-[color:var(--color-decision-stop)]/10 rounded-sm px-3 py-2"
+        >
           {rejections.map((r) => (
-            <li key={`${r.file_index}-${r.display_name}`} className="font-mono">
-              {r.error_code} · {r.display_name} — {r.reason}
+            <li key={`${r.file_index}-${r.display_name}`}>
+              <span className="font-medium">{r.display_name}</span> — {r.reason}{" "}
+              <span className="font-mono text-[10px] text-ink-faint">
+                ({r.error_code})
+              </span>
             </li>
           ))}
         </ul>

@@ -63,6 +63,10 @@
   --font-mono: var(--font-stack-mono);
 }
 
+html {
+  color-scheme: light;
+}
+
 html,
 body {
   background: var(--color-surface);
@@ -70,6 +74,17 @@ body {
   font-family: var(--font-stack-text);
   font-size: 16px;
   line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 a {

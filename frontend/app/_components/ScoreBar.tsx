@@ -32,13 +32,18 @@ export function ScoreBar({
       {label && (
         <div className="flex items-center justify-between text-xs text-ink-muted mb-1">
           <span>{label}</span>
-          <span className="font-mono text-ink">{value.toFixed(2)}</span>
+          <span className="font-mono text-ink tabular-nums">
+            {value.toFixed(2)}
+          </span>
         </div>
       )}
       <div
         className="relative h-2 w-full bg-surface-alt rounded-sm border border-border overflow-hidden"
-        role="img"
-        aria-label={`${label ?? "score"} ${value.toFixed(2)} of ${max}`}
+        role="progressbar"
+        aria-valuenow={value}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-label={label ?? "Score"}
       >
         <div
           className="absolute top-0 left-0 h-full"
@@ -58,7 +63,7 @@ export function ScoreBar({
           {ticks.map((t) => (
             <span
               key={t}
-              className="absolute -translate-x-1/2 text-[10px] font-mono text-ink-faint"
+              className="absolute -translate-x-1/2 text-[10px] font-mono tabular-nums text-ink-faint"
               style={{ left: `${(t / max) * 100}%` }}
             >
               {t.toFixed(2)}
