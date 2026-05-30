@@ -2,8 +2,8 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { submitRequest, type SubmitState } from "../_actions/submitRequest";
-import type { DemoCase, HazardFlags } from "../_server/types";
-import { HazardFlagGridForm } from "../_components/HazardFlagGrid";
+import type { DemoCase, SafetyAnswers } from "../_server/types";
+import { SafetyAnswersGridForm } from "../_components/HazardFlagGrid";
 import { UploadZone } from "../_components/UploadZone";
 import { Send, AlertOctagon } from "lucide-react";
 import { Button } from "../_components/Button";
@@ -17,7 +17,7 @@ type FormDefaults = {
   postal_code_or_fsa: string;
   ward: string;
   observed_at: string;
-  hazard_flags: Partial<HazardFlags>;
+  safety_answers: Partial<SafetyAnswers>;
 };
 
 const DEFAULT_CLOCK = "2026-01-15T20:00";
@@ -31,20 +31,22 @@ const EMPTY: FormDefaults = {
   postal_code_or_fsa: "",
   ward: "",
   observed_at: DEFAULT_CLOCK,
-  hazard_flags: {},
+  safety_answers: {},
 };
 
 function demoToDefaults(c: DemoCase): FormDefaults {
   return {
     case_id: c.case_id,
-    description: c.canonical_ticket.description,
-    location_raw_text: c.canonical_ticket.location.raw_text,
-    intersection_street_1: c.canonical_ticket.location.intersection_street_1 ?? "",
-    intersection_street_2: c.canonical_ticket.location.intersection_street_2 ?? "",
-    postal_code_or_fsa: c.canonical_ticket.location.postal_code_or_fsa ?? "",
-    ward: c.canonical_ticket.location.ward ?? "",
-    observed_at: c.canonical_ticket.observed_at.slice(0, 16),
-    hazard_flags: c.canonical_ticket.hazard_flags,
+    description: c.intake_payload.description,
+    location_raw_text: c.intake_payload.location.raw_text,
+    intersection_street_1:
+      c.intake_payload.location.intersection_street_1 ?? "",
+    intersection_street_2:
+      c.intake_payload.location.intersection_street_2 ?? "",
+    postal_code_or_fsa: c.intake_payload.location.postal_code_or_fsa ?? "",
+    ward: c.intake_payload.location.ward ?? "",
+    observed_at: c.intake_payload.observed_at.slice(0, 16),
+    safety_answers: c.intake_payload.safety_answers,
   };
 }
 
@@ -78,7 +80,7 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
         </label>
         <select
           id="demo-case"
-          className="text-sm border border-border rounded-sm px-2 py-1 bg-surface"
+          className="text-sm border border-border rounded-[3px] px-2 py-1 bg-surface"
           defaultValue=""
           onChange={(e) => {
             const c = demoCases.find((d) => d.case_id === e.target.value);
@@ -102,14 +104,12 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
       {invalid.size > 0 && (
         <div
           role="alert"
-          className="flex items-start gap-2 px-3 py-2 border border-[color:var(--color-decision-warn)]/40 bg-[color:var(--color-decision-warn)]/10 text-[color:var(--color-decision-warn)] rounded-sm text-sm"
+          className="flex items-start gap-2 px-3 py-2 border border-[color:var(--color-decision-warn)]/40 bg-[color:var(--color-decision-warn)]/10 text-[color:var(--color-decision-warn)] rounded-[3px] text-sm"
         >
           <AlertOctagon size={14} className="mt-0.5 shrink-0" aria-hidden />
           <div>
-            <p className="font-medium">NEEDS_MORE_INFO</p>
-            <p className="font-mono text-xs">
-              missing: {[...invalid].join(", ")}
-            </p>
+            <p className="font-medium">Please complete the highlighted fields</p>
+            <p className="font-mono text-xs">missing: {[...invalid].join(", ")}</p>
           </div>
         </div>
       )}
@@ -129,7 +129,7 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
           aria-invalid={invalid.has("description") || undefined}
           aria-describedby={invalid.has("description") ? "err-description" : undefined}
           className={[
-            "w-full border rounded-sm px-3 py-2 text-sm bg-surface text-ink",
+            "w-full border rounded-[3px] px-3 py-2 text-sm bg-surface text-ink",
             invalid.has("description")
               ? "border-[color:var(--color-decision-stop)]"
               : "border-border",
@@ -180,8 +180,8 @@ export function SubmitForm({ demoCases }: { demoCases: DemoCase[] }) {
         invalid={invalid.has("observed_at")}
       />
 
-      <HazardFlagGridForm
-        defaults={defaults.hazard_flags}
+      <SafetyAnswersGridForm
+        defaults={defaults.safety_answers}
         invalid={invalid}
       />
 
@@ -233,7 +233,7 @@ function Field({
         defaultValue={defaultValue}
         aria-invalid={invalid || undefined}
         className={[
-          "w-full border rounded-sm px-3 py-2 text-sm bg-surface text-ink",
+          "w-full border rounded-[3px] px-3 py-2 text-sm bg-surface text-ink",
           invalid
             ? "border-[color:var(--color-decision-stop)]"
             : "border-border",

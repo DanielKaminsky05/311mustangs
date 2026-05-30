@@ -61,8 +61,8 @@ export default async function ApprovalsPage() {
                       value={row.evidence.urgency_decision}
                       size="sm"
                     />
-                    {row.evidence.hard_route_flags.length > 0 && (
-                      <HardRouteBadge flags={row.evidence.hard_route_flags} />
+                    {row.evidence.score_breakdown.hard_routes_triggered.length > 0 && (
+                      <HardRouteBadge flags={row.evidence.score_breakdown.hard_routes_triggered} />
                     )}
                   </div>
                 </div>

@@ -79,12 +79,18 @@
       "category_base_score": 0.15,
       "hazard_boost_total": 0.0,
       "keyword_boost_total": 0.05,
-      "penalty_total": 0.02
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
     },
-    "hard_route_flags": [],
     "route": "SCHEDULING_AGENT",
     "audit_refs": ["aud-001", "aud-002", "aud-003", "aud-004"],
-    "structured_text": "Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Hazards: injury=false; active_danger=false; blocking_road=false; blocking_sidewalk=false; flooding=false; sewage_or_water_issue=false; traffic_signal_issue=false."
+    "category_query_text": "Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "retrieval_query_text": "Reported issue: There is graffiti on a stop sign near Wychwood and Tyrrel. Inferred category candidates: Graffiti; Damaged Sign; Vandalism (Other). Division candidates: Municipal Licensing & Standards; Transportation Services. Section candidates: Investigation Services; Road Operations. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:b1c7e2…"
+    }
   },
   {
     "ticket_id": "tkt-002",
@@ -138,12 +144,18 @@
       "category_base_score": 0.32,
       "hazard_boost_total": 0.22,
       "keyword_boost_total": 0.06,
-      "penalty_total": 0.02
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
     },
-    "hard_route_flags": [],
     "route": "HUMAN_WORKFLOW",
     "audit_refs": ["aud-005", "aud-006", "aud-007"],
-    "structured_text": "Reported issue: Large pothole on Yonge just south of Eglinton, taking up the right lane. Location: Yonge St and Eglinton Ave E. Postal area: M4P. Hazards: blocking_road=true; (others false)."
+    "category_query_text": "Reported issue: Large pothole on Yonge just south of Eglinton, taking up the right lane. Location: Yonge St and Eglinton Ave E. Postal area: M4P. Safety signals reported: blocking_road=yes.",
+    "retrieval_query_text": "Reported issue: Large pothole on Yonge just south of Eglinton, taking up the right lane. Inferred category candidates: Road Pothole / Road Damage; Road - Sinking; Damaged Concrete Sidewalk. Division candidates: Transportation Services. Section candidates: Road Operations. Location: Yonge St and Eglinton Ave E. Postal area: M4P. Safety signals reported: blocking_road=yes.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:9a3d80…"
+    }
   },
   {
     "ticket_id": "tkt-003",
@@ -190,12 +202,18 @@
       "category_base_score": 0.48,
       "hazard_boost_total": 0.50,
       "keyword_boost_total": 0.04,
-      "penalty_total": 0.08
+      "penalty_total": 0.08,
+      "hard_routes_triggered": ["active_danger", "traffic_signal_issue"]
     },
-    "hard_route_flags": ["active_danger", "traffic_signal_issue"],
     "route": "HUMAN_WORKFLOW",
     "audit_refs": ["aud-008", "aud-009", "aud-010"],
-    "structured_text": "Reported issue: Traffic light is dark at Bloor and Spadina. Location: Bloor St W and Spadina Ave. Postal area: M5R. Hazards: active_danger=true; traffic_signal_issue=true; (others false)."
+    "category_query_text": "Reported issue: Traffic light is dark at Bloor and Spadina. Location: Bloor St W and Spadina Ave. Postal area: M5R. Safety signals reported: active_danger=yes; traffic_signal_issue=yes.",
+    "retrieval_query_text": "Reported issue: Traffic light is dark at Bloor and Spadina. Inferred category candidates: Traffic Signal Issue; Street Light Out. Division candidates: Transportation Services. Section candidates: Traffic Control. Location: Bloor St W and Spadina Ave. Postal area: M5R. Safety signals reported: active_danger=yes; traffic_signal_issue=yes.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:f02211…"
+    }
   },
   {
     "ticket_id": "tkt-004",
@@ -242,12 +260,18 @@
       "category_base_score": 0.41,
       "hazard_boost_total": 0.36,
       "keyword_boost_total": 0.08,
-      "penalty_total": 0.03
+      "penalty_total": 0.03,
+      "hard_routes_triggered": []
     },
-    "hard_route_flags": [],
     "route": "HUMAN_WORKFLOW",
     "audit_refs": ["aud-011", "aud-012", "aud-013"],
-    "structured_text": "Reported issue: Basement is flooding, smells like sewage. Location: Pape Ave and Danforth Ave. Postal area: M4K. Hazards: flooding=true; sewage_or_water_issue=true; (others false)."
+    "category_query_text": "Reported issue: Basement is flooding, smells like sewage. Location: Pape Ave and Danforth Ave. Postal area: M4K. Safety signals reported: flooding=yes; sewage_or_water_issue=yes.",
+    "retrieval_query_text": "Reported issue: Basement is flooding, smells like sewage. Inferred category candidates: Flooded Basement; Sewer Backup. Division candidates: Toronto Water. Section candidates: District Operations. Location: Pape Ave and Danforth Ave. Postal area: M4K. Safety signals reported: flooding=yes; sewage_or_water_issue=yes.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:7c441e…"
+    }
   },
   {
     "ticket_id": "tkt-005",
@@ -309,12 +333,18 @@
       "category_base_score": 0.15,
       "hazard_boost_total": 0.0,
       "keyword_boost_total": 0.05,
-      "penalty_total": 0.02
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
     },
-    "hard_route_flags": [],
     "route": "DUPLICATE_WORKFLOW",
     "audit_refs": ["aud-014", "aud-015"],
-    "structured_text": "Reported issue: Still graffiti on the stop sign at Wychwood and Tyrrel — same one someone reported earlier, hasn't been cleaned. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Hazards: all false."
+    "category_query_text": "Reported issue: Still graffiti on the stop sign at Wychwood and Tyrrel. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "retrieval_query_text": "Reported issue: Still graffiti on the stop sign at Wychwood and Tyrrel. Inferred category candidates: Graffiti; Damaged Sign. Division candidates: Municipal Licensing & Standards; Transportation Services. Section candidates: Investigation Services; Road Operations. Location: Wychwood Ave and Tyrrel Ave. Postal area: M6G. Safety signals reported: none.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:b1c7e2…"
+    }
   },
   {
     "ticket_id": "tkt-006",
@@ -368,11 +398,17 @@
       "category_base_score": 0.16,
       "hazard_boost_total": 0.0,
       "keyword_boost_total": 0.07,
-      "penalty_total": 0.02
+      "penalty_total": 0.02,
+      "hard_routes_triggered": []
     },
-    "hard_route_flags": [],
     "route": "HUMAN_WORKFLOW",
     "audit_refs": ["aud-016", "aud-017"],
-    "structured_text": "Reported issue: Something weird is going on with the road, hard to describe — looks broken near the curb. Location: Dufferin St and Bloor St W. Postal area: M6H. Hazards: all false."
+    "category_query_text": "Reported issue: Something weird is going on with the road, hard to describe — looks broken near the curb. Location: Dufferin St and Bloor St W. Postal area: M6H. Safety signals reported: active_danger=unknown; blocking_road=unknown.",
+    "retrieval_query_text": "Reported issue: Something weird is going on with the road, hard to describe — looks broken near the curb. Inferred category candidates: Damaged Concrete Sidewalk; Road Pothole / Road Damage; Clean up Debris on Road. Division candidates: Transportation Services. Section candidates: Road Operations. Location: Dufferin St and Bloor St W. Postal area: M6H. Safety signals reported: active_danger=unknown; blocking_road=unknown.",
+    "embedding_ref": {
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dim": 384,
+      "structured_text_hash": "sha256:341128…"
+    }
   }
 ]

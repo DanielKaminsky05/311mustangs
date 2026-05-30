@@ -4,7 +4,11 @@ import { cookies } from "next/headers";
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { bindSessionToRequest } from "../_server/uploads";
-import { HAZARD_FLAG_KEYS, type HazardFlags } from "../_server/types";
+import {
+  SAFETY_KEYS,
+  type SafetyAnswer,
+  type SafetyAnswers,
+} from "../_server/types";
 
 const SESSION_COOKIE = "311_session";
 
@@ -23,14 +27,14 @@ const CASE_TO_TICKET: Record<string, string> = {
 /** Fallback fuzzy match for free-form submissions without a demo case picked. */
 function inferTargetTicket(
   description: string,
-  hazards: HazardFlags,
+  answers: SafetyAnswers,
 ): string {
   const d = description.toLowerCase();
-  if (hazards.traffic_signal_issue === true || hazards.active_danger === true)
+  if (answers.traffic_signal_issue === "yes" || answers.active_danger === "yes")
     return "tkt-003";
-  if (hazards.flooding === true || hazards.sewage_or_water_issue === true)
+  if (answers.flooding === "yes" || answers.sewage_or_water_issue === "yes")
     return "tkt-004";
-  if (hazards.blocking_road === true) return "tkt-002";
+  if (answers.blocking_road === "yes") return "tkt-002";
   if (d.includes("graffiti")) return "tkt-001";
   if (d.includes("pothole") || d.includes("road damage")) return "tkt-002";
   if (d.includes("flood") || d.includes("sewage")) return "tkt-004";
@@ -44,6 +48,10 @@ export type SubmitErrors = {
 };
 
 export type SubmitState = SubmitErrors & { ok?: boolean };
+
+function isSafetyAnswer(v: unknown): v is SafetyAnswer {
+  return v === "yes" || v === "no" || v === "unknown";
+}
 
 export async function submitRequest(
   _prevState: SubmitState,
@@ -59,15 +67,14 @@ export async function submitRequest(
   if (raw_text.length < 3) missing.push("location.raw_text");
   if (!observed_at) missing.push("observed_at");
 
-  const hazards = {} as HazardFlags;
-  for (const key of HAZARD_FLAG_KEYS) {
-    const raw = formData.get(`hazard_${key}`);
-    if (raw === "true") (hazards as Record<string, unknown>)[key] = true;
-    else if (raw === "false") (hazards as Record<string, unknown>)[key] = false;
-    else if (raw === "unknown" || raw === null)
-      (hazards as Record<string, unknown>)[key] = null;
-    else missing.push(`hazard_flags.${key}`);
-    if (raw === null) missing.push(`hazard_flags.${key}`);
+  const answers = {} as SafetyAnswers;
+  for (const key of SAFETY_KEYS) {
+    const raw = formData.get(`safety_${key}`);
+    if (isSafetyAnswer(raw)) {
+      (answers as Record<string, SafetyAnswer>)[key] = raw;
+    } else {
+      missing.push(`safety_answers.${key}`);
+    }
   }
 
   if (missing.length > 0) {
@@ -75,9 +82,8 @@ export async function submitRequest(
   }
 
   const target =
-    CASE_TO_TICKET[case_id] ?? inferTargetTicket(description, hazards);
+    CASE_TO_TICKET[case_id] ?? inferTargetTicket(description, answers);
 
-  // Bind any session-scoped uploads to the target ticket
   const cookieStore = await cookies();
   const session_id = cookieStore.get(SESSION_COOKIE)?.value;
   if (session_id) {

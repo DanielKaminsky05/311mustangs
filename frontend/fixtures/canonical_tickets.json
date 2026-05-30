@@ -14,6 +14,15 @@
     },
     "observed_at": "2026-01-15T19:48:00",
     "reported_at": "2026-01-15T19:51:00",
+    "safety_answers": {
+      "injury": "no",
+      "active_danger": "no",
+      "blocking_road": "no",
+      "blocking_sidewalk": "no",
+      "flooding": "no",
+      "sewage_or_water_issue": "no",
+      "traffic_signal_issue": "no"
+    },
     "hazard_flags": {
       "injury": false,
       "active_danger": false,
@@ -41,6 +50,15 @@
     },
     "observed_at": "2026-01-15T18:22:00",
     "reported_at": "2026-01-15T18:25:00",
+    "safety_answers": {
+      "injury": "no",
+      "active_danger": "no",
+      "blocking_road": "yes",
+      "blocking_sidewalk": "no",
+      "flooding": "no",
+      "sewage_or_water_issue": "no",
+      "traffic_signal_issue": "no"
+    },
     "hazard_flags": {
       "injury": false,
       "active_danger": false,
@@ -68,6 +86,15 @@
     },
     "observed_at": "2026-01-15T19:55:00",
     "reported_at": "2026-01-15T19:57:00",
+    "safety_answers": {
+      "injury": "no",
+      "active_danger": "yes",
+      "blocking_road": "no",
+      "blocking_sidewalk": "no",
+      "flooding": "no",
+      "sewage_or_water_issue": "no",
+      "traffic_signal_issue": "yes"
+    },
     "hazard_flags": {
       "injury": false,
       "active_danger": true,
@@ -95,6 +122,15 @@
     },
     "observed_at": "2026-01-15T19:30:00",
     "reported_at": "2026-01-15T19:34:00",
+    "safety_answers": {
+      "injury": "no",
+      "active_danger": "no",
+      "blocking_road": "no",
+      "blocking_sidewalk": "no",
+      "flooding": "yes",
+      "sewage_or_water_issue": "yes",
+      "traffic_signal_issue": "no"
+    },
     "hazard_flags": {
       "injury": false,
       "active_danger": false,
@@ -122,6 +158,15 @@
     },
     "observed_at": "2026-01-15T20:02:00",
     "reported_at": "2026-01-15T20:03:00",
+    "safety_answers": {
+      "injury": "no",
+      "active_danger": "no",
+      "blocking_road": "no",
+      "blocking_sidewalk": "no",
+      "flooding": "no",
+      "sewage_or_water_issue": "no",
+      "traffic_signal_issue": "no"
+    },
     "hazard_flags": {
       "injury": false,
       "active_danger": false,
@@ -149,10 +194,19 @@
     },
     "observed_at": "2026-01-15T19:10:00",
     "reported_at": "2026-01-15T19:12:00",
+    "safety_answers": {
+      "injury": "no",
+      "active_danger": "unknown",
+      "blocking_road": "unknown",
+      "blocking_sidewalk": "no",
+      "flooding": "no",
+      "sewage_or_water_issue": "no",
+      "traffic_signal_issue": "no"
+    },
     "hazard_flags": {
       "injury": false,
-      "active_danger": false,
-      "blocking_road": false,
+      "active_danger": null,
+      "blocking_road": null,
       "blocking_sidewalk": false,
       "flooding": false,
       "sewage_or_water_issue": false,

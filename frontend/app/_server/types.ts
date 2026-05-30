@@ -1,12 +1,28 @@
 /**
- * Type shapes mirror docs/planning/data-pipeline.md.
- * When this file disagrees with data-pipeline.md, data-pipeline.md wins.
+ * Type shapes mirror docs/planning/whatsapp-api.md.
+ * When this file disagrees with whatsapp-api.md, whatsapp-api.md wins.
  *
  * Note: pure type module — shared with both Server Components and Client
- * Components (e.g. HazardFlagGridForm). Do not add server-only side-effect
- * imports here.
+ * Components. Do not add server-only side-effect imports here.
  */
 
+// ----------------------------------------------------------------------------
+// Citizen safety answers + backend-derived hazard flags
+// ----------------------------------------------------------------------------
+
+export type SafetyAnswer = "yes" | "no" | "unknown";
+
+export type SafetyAnswers = {
+  injury: SafetyAnswer;
+  active_danger: SafetyAnswer;
+  blocking_road: SafetyAnswer;
+  blocking_sidewalk: SafetyAnswer;
+  flooding: SafetyAnswer;
+  sewage_or_water_issue: SafetyAnswer;
+  traffic_signal_issue: SafetyAnswer;
+};
+
+/** Backend-normalized: yes → true, no → false, unknown → null. */
 export type HazardFlag = boolean | null;
 
 export type HazardFlags = {
@@ -19,7 +35,7 @@ export type HazardFlags = {
   traffic_signal_issue: HazardFlag;
 };
 
-export const HAZARD_FLAG_KEYS = [
+export const SAFETY_KEYS = [
   "injury",
   "active_danger",
   "blocking_road",
@@ -27,13 +43,23 @@ export const HAZARD_FLAG_KEYS = [
   "flooding",
   "sewage_or_water_issue",
   "traffic_signal_issue",
-] as const satisfies readonly (keyof HazardFlags)[];
+] as const satisfies readonly (keyof SafetyAnswers)[];
 
-export const HARD_ROUTE_FLAG_KEYS = [
+export const HARD_ROUTE_KEYS = [
   "injury",
   "active_danger",
   "traffic_signal_issue",
-] as const satisfies readonly (keyof HazardFlags)[];
+] as const satisfies readonly (keyof SafetyAnswers)[];
+
+export function safetyAnswerToFlag(v: SafetyAnswer): HazardFlag {
+  if (v === "yes") return true;
+  if (v === "no") return false;
+  return null;
+}
+
+// ----------------------------------------------------------------------------
+// Canonical ticket
+// ----------------------------------------------------------------------------
 
 export type CanonicalLocation = {
   raw_text: string;
@@ -52,10 +78,15 @@ export type CanonicalTicket = {
   location: CanonicalLocation;
   observed_at: string;
   reported_at: string;
+  safety_answers: SafetyAnswers;
   hazard_flags: HazardFlags;
   media_refs: string[];
   metadata: Record<string, unknown>;
 };
+
+// ----------------------------------------------------------------------------
+// Evidence pack (Stage 8 routing output of whatsapp-api.md)
+// ----------------------------------------------------------------------------
 
 export type CategoryCandidate = {
   service_request_type: string;
@@ -77,7 +108,7 @@ export type NearestRecord = {
   status: string;
   creation_date: string;
   structured_text: string;
-  // Optional metadata-filter signal that drove duplicate_decision
+  // Optional metadata-filter outcome that drove duplicate_decision
   filter_match?: string[];
 };
 
@@ -95,6 +126,20 @@ export type Route =
   | "HUMAN_WORKFLOW"
   | "DUPLICATE_WORKFLOW";
 
+export type EmbeddingRef = {
+  embedding_model: string;
+  embedding_dim: number;
+  structured_text_hash: string;
+};
+
+export type ScoreBreakdown = {
+  category_base_score: number;
+  hazard_boost_total: number;
+  keyword_boost_total: number;
+  penalty_total: number;
+  hard_routes_triggered: (keyof SafetyAnswers)[];
+};
+
 export type EvidencePack = {
   ticket_id: string;
   category_candidates: CategoryCandidate[];
@@ -107,17 +152,17 @@ export type EvidencePack = {
   duplicate_score: number;
   urgency_score: number;
   urgency_decision: UrgencyDecision;
-  score_breakdown: {
-    category_base_score: number;
-    hazard_boost_total: number;
-    keyword_boost_total: number;
-    penalty_total: number;
-  };
-  hard_route_flags: (keyof HazardFlags)[];
+  score_breakdown: ScoreBreakdown;
   route: Route;
   audit_refs: string[];
-  structured_text: string;
+  category_query_text: string;
+  retrieval_query_text: string;
+  embedding_ref: EmbeddingRef;
 };
+
+// ----------------------------------------------------------------------------
+// Audit / metrics / fixtures / etc. — unchanged shapes
+// ----------------------------------------------------------------------------
 
 export type AuditEntry = {
   audit_id: string;
@@ -157,7 +202,16 @@ export type DemoCase = {
   case_id: string;
   title: string;
   blurb: string;
-  canonical_ticket: Omit<CanonicalTicket, "ticket_id" | "reported_at">;
+  /** Intake payload — safety_answers, not hazard_flags. */
+  intake_payload: {
+    source: CanonicalTicket["source"];
+    description: string;
+    location: CanonicalLocation;
+    observed_at: string;
+    safety_answers: SafetyAnswers;
+    media_refs: string[];
+    metadata?: Record<string, unknown>;
+  };
 };
 
 export type CopilotScript = Record<
@@ -181,7 +235,7 @@ export type ScheduleAssignment = {
   proposed_slot: string;
   rank: number;
   explanation: string;
-  batches_with: string | null; // operation_id
+  batches_with: string | null;
 };
 
 export type ApprovalEntry = {

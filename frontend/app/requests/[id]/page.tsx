@@ -17,9 +17,7 @@ import { ConfidenceList } from "../../_components/ConfidenceList";
 import { ScoreBar } from "../../_components/ScoreBar";
 import { ScoreBreakdown } from "../../_components/ScoreBreakdown";
 import { EvidenceCard } from "../../_components/EvidenceCard";
-import {
-  HazardFlagGridReadonly,
-} from "../../_components/HazardFlagGrid";
+import { SafetyAnswersReadout } from "../../_components/HazardFlagGrid";
 import { AttachmentTile } from "../../_components/AttachmentTile";
 import { EmptyState } from "../../_components/EmptyState";
 import { CopilotChatPanel } from "./CopilotChatPanel";
@@ -86,7 +84,7 @@ export default async function TriagePage(props: {
         <DecisionChip signal="duplicate" value={evidence.duplicate_decision} />
         <DecisionChip signal="urgency" value={evidence.urgency_decision} />
         <DecisionChip signal="route" value={evidence.route} />
-        <HardRouteBadge flags={evidence.hard_route_flags} />
+        <HardRouteBadge flags={evidence.score_breakdown.hard_routes_triggered} />
       </div>
 
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_18rem] gap-6">
@@ -123,9 +121,10 @@ export default async function TriagePage(props: {
               <p className="text-xs uppercase tracking-wide text-ink-faint mb-2">
                 hazard_flags
               </p>
-              <HazardFlagGridReadonly
+              <SafetyAnswersReadout
+                answers={ticket.safety_answers}
                 flags={ticket.hazard_flags}
-                fired={evidence.hard_route_flags}
+                fired={evidence.score_breakdown.hard_routes_triggered}
               />
             </div>
             <div>
@@ -163,14 +162,30 @@ export default async function TriagePage(props: {
             confidence={evidence.category_confidence}
             margin={evidence.category_margin}
           />
-          <details className="mt-4">
-            <summary className="cursor-pointer text-xs text-ink-muted hover:text-ink">
-              structured_text used as the query embedding
-            </summary>
-            <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-sm">
-              {evidence.structured_text}
-            </pre>
-          </details>
+          <div className="mt-4 flex flex-col gap-3">
+            <details>
+              <summary className="cursor-pointer text-xs text-ink-muted hover:text-ink">
+                Category query text · embedded against the category taxonomy
+              </summary>
+              <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-[3px]">
+                {evidence.category_query_text}
+              </pre>
+            </details>
+            <details>
+              <summary className="cursor-pointer text-xs text-ink-muted hover:text-ink">
+                Retrieval query text · category-augmented, embedded against
+                historical / active indexes
+              </summary>
+              <pre className="mt-2 whitespace-pre-wrap font-mono text-[11px] text-ink bg-surface-alt p-2 border border-border rounded-[3px]">
+                {evidence.retrieval_query_text}
+              </pre>
+            </details>
+            <p className="text-[11px] font-mono text-ink-faint">
+              embedding: {evidence.embedding_ref.embedding_model} · dim{" "}
+              {evidence.embedding_ref.embedding_dim} · hash{" "}
+              {evidence.embedding_ref.structured_text_hash}
+            </p>
+          </div>
         </Panel>
 
         <Panel id="urgency" title="Urgency score">

@@ -95,8 +95,8 @@ export default async function DashboardPage() {
               value={r.evidence.urgency_decision}
               size="sm"
             />
-            {r.evidence.hard_route_flags.length > 0 && (
-              <HardRouteBadge flags={r.evidence.hard_route_flags} />
+            {r.evidence.score_breakdown.hard_routes_triggered.length > 0 && (
+              <HardRouteBadge flags={r.evidence.score_breakdown.hard_routes_triggered} />
             )}
           </div>
         ) : null,
