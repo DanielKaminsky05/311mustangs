@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     cors_origins: list[str] = []
     secret_key: str = "change-me"
 
+    # Twilio WhatsApp (loaded from TWILIO_* env vars; blank until pasted into .env)
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_whatsapp_from: str = ""  # e.g. "whatsapp:+14155238886"
+    intake_agent_secret: str = ""  # only if the intake agent is a separate service
+
 
 @lru_cache
 def get_settings() -> Settings:
