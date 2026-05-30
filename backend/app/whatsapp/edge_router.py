@@ -96,6 +96,12 @@ async def whatsapp_inbound(
         location_pin=location_pin,
     )
 
+    print(
+        f"Received message from {From} (sender_hash={sender_hash}). "
+        f"MessageSid={MessageSid}, text='{Body}', media_count={NumMedia}, "
+        f"location_pin={location_pin}, media_urls={media_urls}"
+    )
+
     # 200 fast — Twilio is happy, real work happens in the background task.
     return Response(status_code=status.HTTP_200_OK)
 

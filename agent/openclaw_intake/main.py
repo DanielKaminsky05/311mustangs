@@ -30,7 +30,7 @@ class Settings:
         self.backend_url = os.environ["INTAKE_BACKEND_URL"].rstrip("/")
         self.intake_secret = os.environ["INTAKE_AGENT_SECRET"]
         self.inference_base_url = os.environ.get(
-            "INFERENCE_BASE_URL", "http://inference.local"
+            "INFERENCE_BASE_URL", "http://host.openshell.internal:11434"
         ).rstrip("/")
         self.inference_model = os.environ.get("INFERENCE_MODEL", "gemma4:26b")
 

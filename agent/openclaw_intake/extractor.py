@@ -96,7 +96,12 @@ async def extract_and_decide(
     payload = {
         "model": inference_model,
         "stream": False,
-        "format": "json",
+        # OpenAI-compatible JSON mode. Ollama honors this on /v1, and the
+        # NemoClaw gateway only forwards /v1/** paths.
+        "response_format": {"type": "json_object"},
+        # gemma4 emits a `reasoning` block before `content`; budget for both
+        # or the extracted JSON will come back empty (finish_reason=length).
+        "max_tokens": 800,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_block},
@@ -104,16 +109,19 @@ async def extract_and_decide(
     }
 
     async with httpx.AsyncClient(timeout=60.0) as client:
-        # Ollama's `/api/chat` endpoint. Inside the sandbox, inference.local
-        # routes to the host Ollama; outside, point INFERENCE_BASE_URL at the
-        # GX10 directly.
-        r = await client.post(f"{inference_base_url}/api/chat", json=payload)
+        # OpenAI-compatible chat completions. Works both inside the sandbox
+        # (http://host.openshell.internal:11434/v1/chat/completions, routed
+        # through the local-inference preset) and outside against Ollama
+        # directly (http://<gx10-tailscale-ip>:11434/v1/chat/completions).
+        r = await client.post(
+            f"{inference_base_url}/v1/chat/completions", json=payload
+        )
         r.raise_for_status()
         data = r.json()
 
-    # Ollama returns the model's reply at message.content. With format=json,
-    # the content IS a JSON string.
-    content = data.get("message", {}).get("content", "{}")
+    # OpenAI shape: choices[0].message.content. With JSON mode the content is
+    # a JSON string.
+    content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
     try:
         return json.loads(content)
     except json.JSONDecodeError:
