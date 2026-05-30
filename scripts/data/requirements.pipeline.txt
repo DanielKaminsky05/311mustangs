@@ -1,0 +1,10 @@
+# One-time 311 pipeline dependencies (DGX Spark path)
+pyarrow
+numpy
+pandas
+requests
+fastembed
+
+# RAPIDS GPU dataframe path (required for judging run)
+--extra-index-url https://pypi.nvidia.com
+cudf-cu13

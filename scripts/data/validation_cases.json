@@ -1,0 +1,49 @@
+{
+  "category_cases": [
+    {
+      "id": "cat_graffiti_sign",
+      "query_text": "Graffiti on a street sign at Wychwood Ave and Tyrrel Ave.",
+      "expected_any_of": ["graffiti", "sign"]
+    },
+    {
+      "id": "cat_pothole",
+      "query_text": "Large pothole causing bumps near Finch Ave E and Leslie St.",
+      "expected_any_of": ["pothole", "road damage"]
+    },
+    {
+      "id": "cat_traffic_signal",
+      "query_text": "Traffic lights are out at a major intersection.",
+      "expected_any_of": ["traffic signal", "signal"]
+    },
+    {
+      "id": "cat_debris",
+      "query_text": "Debris on roadway creating hazard to cars.",
+      "expected_any_of": ["debris", "road"]
+    },
+    {
+      "id": "cat_litter",
+      "query_text": "Overflowing litter and garbage bin in public area.",
+      "expected_any_of": ["litter", "garbage", "waste"]
+    }
+  ],
+  "duplicate_cases": [
+    {
+      "id": "dup_order_swap",
+      "text_a": "Graffiti on stop sign near Wychwood Ave and Tyrrel Ave",
+      "text_b": "Graffiti near Tyrrel Ave and Wychwood Ave on a stop sign",
+      "min_cosine": 0.75
+    },
+    {
+      "id": "dup_typo_noise",
+      "text_a": "Pothole at Finch Ave E and Leslie St",
+      "text_b": "Pothol at Finhc Ave East & Lesli Street",
+      "min_cosine": 0.65
+    }
+  ],
+  "thresholds": {
+    "category_top1_min": 0.2,
+    "category_top3_min": 0.6,
+    "duplicate_pass_ratio_min": 0.8,
+    "nonzero_vector_ratio_min": 1.0
+  }
+}
