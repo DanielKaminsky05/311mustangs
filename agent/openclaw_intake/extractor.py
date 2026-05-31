@@ -14,6 +14,7 @@ the user did not provide.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict
 from typing import Any
 
@@ -101,7 +102,7 @@ async def extract_and_decide(
         "response_format": {"type": "json_object"},
         # gemma4 emits a `reasoning` block before `content`; budget for both
         # or the extracted JSON will come back empty (finish_reason=length).
-        "max_tokens": 800,
+        "max_tokens": 3000,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_block},
@@ -121,7 +122,10 @@ async def extract_and_decide(
 
     # OpenAI shape: choices[0].message.content. With JSON mode the content is
     # a JSON string.
-    content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+    content = (data.get("choices", [{}])[0].get("message", {}).get("content") or "{}").strip()
+    if content.startswith("```"):
+        content = re.sub(r"^```[a-zA-Z]*\s*", "", content)
+        content = re.sub(r"\s*```$", "", content).strip()
     try:
         return json.loads(content)
     except json.JSONDecodeError:

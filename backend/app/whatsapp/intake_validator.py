@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from app.whatsapp.schemas import Accepted, FollowUpPrompt, NeedsMoreInfo
 
-REQUIRED_KEYS = ("DESCRIPTION", "INTERSECTION", "WARD")
+REQUIRED_KEYS = ("DESCRIPTION", "INTERSECTION")  # ward optional; city derives from intersection
 
 
 def _parse_ticket_text(ticket_text: str) -> dict[str, str]:
@@ -38,13 +38,6 @@ def _missing_prompts(fields: dict[str, str]) -> list[FollowUpPrompt]:
             FollowUpPrompt(
                 field="INTERSECTION",
                 prompt="What intersection is this near? Format: street1 x street2.",
-            )
-        )
-    if not fields.get("WARD"):
-        prompts.append(
-            FollowUpPrompt(
-                field="WARD",
-                prompt="If you know it, what ward is this in?",
             )
         )
     return prompts
