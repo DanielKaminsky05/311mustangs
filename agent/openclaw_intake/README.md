@@ -77,9 +77,9 @@ curl -X POST http://localhost:9000/messages -H "Content-Type: application/json" 
 ## Plug points
 
 - `extractor.extract_and_decide()` — current implementation is a thin
-  Ollama JSON-mode prompt. Replace the prompt with the system-prompt design
-  from `docs/planning/agents.md` (intake agent section) as that document
-  evolves.
+  Ollama JSON-mode prompt. Keep it aligned with the intake-agent behavior in
+  `docs/planning/whatsapp-integration.md` and the current pivot plan in
+  `docs/planning/README.md`.
 - `state.ConversationStore` — in-memory dict for the MVP; swap for a
   SQLite-backed store when persistence/restart-safety matters (A18).
 - Multi-issue detection (A12) is unimplemented; the current loop accepts

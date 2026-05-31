@@ -12,14 +12,10 @@ import json
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from pydantic import ValidationError
 
-from app.whatsapp.deps import ConversationStoreDep, SettingsDep
+from app.whatsapp.deps import ConversationStoreDep, SettingsDep, VectorStoreDep
 from app.whatsapp.hmac_auth import verify_signature
 from app.whatsapp.intake_validator import validate_and_run
-from app.whatsapp.schemas import (
-    BACKEND_OWNED_FIELDS,
-    Accepted,
-    TicketSubmissionEnvelope,
-)
+from app.whatsapp.schemas import Accepted, TicketTextSubmissionEnvelope
 
 router = APIRouter(
     prefix="/api/v1/webhooks/whatsapp", tags=["whatsapp-intake"]
@@ -34,6 +30,7 @@ async def ticket_submissions(
     request: Request,
     settings: SettingsDep,
     conversations: ConversationStoreDep,
+    vector_store: VectorStoreDep,
 ):
     raw = await request.body()
 
@@ -46,8 +43,7 @@ async def ticket_submissions(
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "bad intake signature")
 
     # 2. Parse JSON envelope. 400 on malformed JSON; Pydantic returns 422 on
-    #    invalid types (including backend-owned fields because TicketIntake has
-    #    extra="forbid").
+    #    invalid types.
     try:
         payload = json.loads(raw)
     except json.JSONDecodeError as e:
@@ -55,27 +51,8 @@ async def ticket_submissions(
             status.HTTP_400_BAD_REQUEST, f"malformed JSON: {e}"
         ) from e
 
-    # 3. Surface a clean error when the agent sent a backend-owned field.
-    #    `extra="forbid"` will already trip — but the default Pydantic message
-    #    doesn't say *why*. Pre-check so the agent gets a useful follow-up.
-    raw_ticket = payload.get("ticket") if isinstance(payload, dict) else None
-    if isinstance(raw_ticket, dict):
-        leaked = sorted(BACKEND_OWNED_FIELDS & raw_ticket.keys())
-        if leaked:
-            raise HTTPException(
-                status.HTTP_422_UNPROCESSABLE_ENTITY,
-                {
-                    "error": "backend_owned_field_in_ticket",
-                    "fields": leaked,
-                    "hint": (
-                        "The agent submits FACTS only. The backend owns "
-                        f"{sorted(BACKEND_OWNED_FIELDS)}."
-                    ),
-                },
-            )
-
     try:
-        envelope = TicketSubmissionEnvelope.model_validate(payload)
+        envelope = TicketTextSubmissionEnvelope.model_validate(payload)
     except ValidationError as e:
         # include_url=False/include_context=False keeps the detail JSON-clean
         # (otherwise Pydantic ships a raw ValueError instance in ctx).
@@ -94,11 +71,27 @@ async def ticket_submissions(
         )
 
     # 5. Validate + run the (stubbed) pipeline.
-    result = validate_and_run(envelope.ticket)
+    result = validate_and_run(envelope.ticket_text)
     status_code = (
         status.HTTP_201_CREATED if isinstance(result, Accepted) else status.HTTP_200_OK
     )
     body = result.model_dump()
+
+    if isinstance(result, Accepted) and vector_store is not None:
+        try:
+            vector_store.upsert_ticket_text(
+                ticket_id=result.ticket_id,
+                text=envelope.ticket_text,
+                payload={
+                    "kind": "ticket",
+                    "status": result.status,
+                    "conversation_id": envelope.channel.conversation_id,
+                    "sender_id_hash": envelope.channel.sender_id_hash,
+                },
+            )
+        except Exception:
+            # Best-effort in MVP. Do not fail webhook response if vector upsert fails.
+            pass
 
     conversations.remember_event(
         envelope.event_id, {"status_code": status_code, "body": body}

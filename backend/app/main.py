@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.users import UserStore, router as users_router
+from app.vector_store import LocalVectorConfig, LocalVectorStore
 from app.whatsapp.conversation_state import ConversationStore
 from app.whatsapp.edge_router import router as whatsapp_edge_router
 from app.whatsapp.intake_router import router as whatsapp_intake_router
@@ -16,6 +17,17 @@ async def lifespan(app: FastAPI):
     # Startup: build shared resources. A real DB connection pool would open here.
     app.state.users = UserStore()
     app.state.conversations = ConversationStore()
+    settings = get_settings()
+    app.state.vector_store = None
+    if settings.vector_enabled and settings.qdrant_url:
+        app.state.vector_store = LocalVectorStore(
+            LocalVectorConfig(
+                url=settings.qdrant_url,
+                api_key=settings.qdrant_api_key,
+                collection=settings.qdrant_collection,
+                embedding_model=settings.embedding_model,
+            )
+        )
     yield
     # Shutdown: close pools / flush here. Nothing to release for in-memory.
 
