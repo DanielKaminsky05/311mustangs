@@ -78,3 +78,26 @@ async def test_location_pin_accepted(client):
         },
     )
     assert resp.status_code == 200
+
+
+async def test_twilio_from_forwarded_to_sandbox(client, monkeypatch):
+    from app.whatsapp import edge_router
+
+    seen = {}
+
+    async def _fake_post_inbound_message(settings, **kwargs):
+        seen.update(kwargs)
+
+    monkeypatch.setattr(edge_router, "post_inbound_message", _fake_post_inbound_message)
+
+    resp = await client.post(
+        "/api/v1/webhooks/whatsapp",
+        data={
+            "From": "whatsapp:+14155551234",
+            "Body": "Need help",
+            "MessageSid": "SM-forward",
+            "NumMedia": "0",
+        },
+    )
+    assert resp.status_code == 200
+    assert seen["twilio_from"] == "whatsapp:+14155551234"

@@ -93,6 +93,7 @@ async def whatsapp_inbound(
         message_id=MessageSid,
         text=Body,
         media_urls=media_urls,
+        twilio_from=From,
         location_pin=location_pin,
     )
 
@@ -114,6 +115,7 @@ async def _forward_to_sandbox(
     message_id: str,
     text: str,
     media_urls: list[str],
+    twilio_from: str,
     location_pin: dict | None,
 ) -> None:
     # TODO: download media via twilio_client.download_media, persist, mint
@@ -129,5 +131,6 @@ async def _forward_to_sandbox(
         message_id=message_id,
         text=text,
         media_refs=media_refs,
+        twilio_from=twilio_from,
         location_pin=location_pin,
     )

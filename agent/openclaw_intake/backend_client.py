@@ -43,7 +43,7 @@ async def submit_ticket(
             "sender_id_hash": sender_id_hash,
             "message_ids": message_ids,
         },
-        "ticket": facts.to_intake_ticket(),
+        "ticket_text": facts.to_ticket_text_v1(),
     }
     body = json.dumps(payload).encode()
     headers = {

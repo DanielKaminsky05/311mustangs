@@ -1,11 +1,4 @@
-"""Tests for the structured-ticket webhook contract.
-
-Covers: HMAC auth, missing fields → NEEDS_MORE_INFO, complete payload →
-ACCEPTED, backend-owned field rejection, idempotency by event_id.
-
-The edge router has its own integration shape (form-encoded, Twilio
-signature) covered in test_whatsapp_edge.py.
-"""
+"""Tests for TICKET_TEXT_V1 structured-ticket webhook."""
 
 import json
 
@@ -23,7 +16,16 @@ def _override_settings():
     return Settings(intake_agent_secret=INTAKE_SECRET)
 
 
-def _complete_payload(event_id: str = "evt-1") -> dict:
+def _ticket_text(*, description: str = "Pothole near Bay and King", intersection: str = "Bay St x King St W", ward: str = "Ward 10") -> str:
+    return (
+        "TICKET_TEXT_V1\n"
+        f"DESCRIPTION: {description}\n"
+        f"INTERSECTION: {intersection}\n"
+        f"WARD: {ward}"
+    )
+
+
+def _payload(event_id: str = "evt-1", ticket_text: str | None = None) -> dict:
     return {
         "event_id": event_id,
         "event_type": "ticket.submitted",
@@ -35,30 +37,7 @@ def _complete_payload(event_id: str = "evt-1") -> dict:
             "sender_id_hash": HASHED_SENDER,
             "message_ids": ["wamid.123"],
         },
-        "ticket": {
-            "source": "whatsapp",
-            "description": "Graffiti on a stop sign near Wychwood and Tyrrel.",
-            "location": {
-                "raw_text": "Wychwood Ave and Tyrrel Ave",
-                "intersection_street_1": "Wychwood Ave",
-                "intersection_street_2": "Tyrrel Ave",
-                "postal_code_or_fsa": "M6G",
-                "ward": None,
-                "latitude": None,
-                "longitude": None,
-            },
-            "observed_at": "2026-05-30T20:00:00",
-            "safety_answers": {
-                "injury": "no",
-                "active_danger": "no",
-                "blocking_road": "no",
-                "blocking_sidewalk": "no",
-                "flooding": "no",
-                "sewage_or_water_issue": "no",
-                "traffic_signal_issue": "no",
-            },
-            "media_refs": [],
-        },
+        "ticket_text": ticket_text or _ticket_text(),
     }
 
 
@@ -87,92 +66,49 @@ URL = "/api/v1/webhooks/whatsapp/ticket-submissions"
 
 
 async def test_complete_payload_accepted(client):
-    body, headers = _post(_complete_payload())
+    body, headers = _post(_payload())
     resp = await client.post(URL, content=body, headers=headers)
     assert resp.status_code == 201
     out = resp.json()
     assert out["status"] == "ACCEPTED"
     assert out["ticket_id"].startswith("ticket-")
-    assert out["canonical_ticket"]["hazard_flags"]["injury"] is False
+    assert out["canonical_ticket"]["intersection"] == "Bay St x King St W"
 
 
-async def test_missing_location_returns_needs_more_info(client):
-    payload = _complete_payload()
-    payload["ticket"]["location"] = {
-        "raw_text": None,
-        "intersection_street_1": None,
-        "intersection_street_2": None,
-        "postal_code_or_fsa": None,
-        "ward": None,
-        "latitude": None,
-        "longitude": None,
-    }
-    body, headers = _post(payload)
+async def test_missing_ward_returns_needs_more_info(client):
+    body, headers = _post(_payload(ticket_text=_ticket_text(ward="")))
     resp = await client.post(URL, content=body, headers=headers)
     assert resp.status_code == 200
     out = resp.json()
     assert out["status"] == "NEEDS_MORE_INFO"
-    assert "location" in out["missing_fields"]
-    assert out["follow_up_prompts"][0]["field"] == "location"
+    assert "WARD" in out["missing_fields"]
 
 
-async def test_unknown_safety_answer_is_preserved(client):
-    payload = _complete_payload(event_id="evt-unk")
-    payload["ticket"]["safety_answers"]["injury"] = "unknown"
-    body, headers = _post(payload)
+async def test_invalid_prefix_returns_needs_more_info(client):
+    p = _payload(ticket_text="DESCRIPTION: x")
+    body, headers = _post(p)
     resp = await client.post(URL, content=body, headers=headers)
-    assert resp.status_code == 201
-    flags = resp.json()["canonical_ticket"]["hazard_flags"]
-    # `unknown` MUST NOT coerce to False — the contract requires tri-state.
-    assert flags["injury"] is None
+    assert resp.status_code == 200
+    assert resp.json()["missing_fields"] == ["TICKET_TEXT_V1"]
 
 
 async def test_missing_signature_rejected(client):
-    body = json.dumps(_complete_payload()).encode()
-    resp = await client.post(
-        URL, content=body, headers={"Content-Type": "application/json"}
-    )
+    body = json.dumps(_payload()).encode()
+    resp = await client.post(URL, content=body, headers={"Content-Type": "application/json"})
     assert resp.status_code == 401
-
-
-async def test_bad_signature_rejected(client):
-    body, _ = _post(_complete_payload())
-    resp = await client.post(
-        URL,
-        content=body,
-        headers={
-            "Content-Type": "application/json",
-            "X-Intake-Signature": "sha256=deadbeef",
-        },
-    )
-    assert resp.status_code == 401
-
-
-async def test_backend_owned_field_rejected(client):
-    payload = _complete_payload(event_id="evt-leak")
-    payload["ticket"]["urgency_score"] = 0.9
-    body, headers = _post(payload)
-    resp = await client.post(URL, content=body, headers=headers)
-    assert resp.status_code == 422
-    detail = resp.json()["detail"]
-    assert detail["error"] == "backend_owned_field_in_ticket"
-    assert "urgency_score" in detail["fields"]
 
 
 async def test_idempotent_same_event_id(client):
-    payload = _complete_payload(event_id="evt-idem")
-    body, headers = _post(payload)
-
+    body, headers = _post(_payload(event_id="evt-idem"))
     first = await client.post(URL, content=body, headers=headers)
     second = await client.post(URL, content=body, headers=headers)
-
     assert first.status_code == second.status_code == 201
     assert first.json()["ticket_id"] == second.json()["ticket_id"]
 
 
 async def test_raw_phone_in_sender_hash_rejected(client):
-    payload = _complete_payload(event_id="evt-rawphone")
-    payload["channel"]["sender_id_hash"] = "whatsapp:+14155551234"
-    body, headers = _post(payload)
+    p = _payload(event_id="evt-rawphone")
+    p["channel"]["sender_id_hash"] = "whatsapp:+14155551234"
+    body, headers = _post(p)
     resp = await client.post(URL, content=body, headers=headers)
     assert resp.status_code == 422

@@ -59,24 +59,25 @@ class ConversationFacts:
     follow_ups_sent: int = 0
     submitted_ticket_id: str | None = None
 
-    def to_intake_ticket(self) -> dict:
-        """Shape that maps cleanly onto the backend TicketIntake schema."""
-        return {
-            "source": "whatsapp",
-            "description": self.description,
-            "location": {
-                "raw_text": self.location.raw_text,
-                "intersection_street_1": self.location.intersection_street_1,
-                "intersection_street_2": self.location.intersection_street_2,
-                "postal_code_or_fsa": self.location.postal_code_or_fsa,
-                "ward": self.location.ward,
-                "latitude": self.location.latitude,
-                "longitude": self.location.longitude,
-            },
-            "observed_at": self.observed_at,
-            "safety_answers": dict(self.safety_answers),
-            "media_refs": list(self.media_refs),
-        }
+    def to_ticket_text_v1(self) -> str:
+        """Render the text-only intake payload expected by the backend."""
+        intersection = ""
+        if self.location.intersection_street_1 and self.location.intersection_street_2:
+            intersection = (
+                f"{self.location.intersection_street_1} x "
+                f"{self.location.intersection_street_2}"
+            )
+        elif self.location.raw_text:
+            intersection = self.location.raw_text
+
+        ward = self.location.ward or ""
+        description = self.description or ""
+        return (
+            "TICKET_TEXT_V1\n"
+            f"DESCRIPTION: {description}\n"
+            f"INTERSECTION: {intersection}\n"
+            f"WARD: {ward}"
+        )
 
 
 class ConversationStore:

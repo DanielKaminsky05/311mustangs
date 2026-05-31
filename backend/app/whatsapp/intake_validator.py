@@ -1,85 +1,94 @@
-"""Structured-ticket validation + pipeline-stub.
+"""Validation + pipeline stub for TICKET_TEXT_V1 payloads."""
 
-This module enforces the contract from `docs/planning/whatsapp-api.md`:
-
-- description non-empty
-- location has raw_text OR at least one structured field
-- safety_answers complete (7 keys, yes/no/unknown)
-
-`unknown` safety answers are valid and MUST NOT be coerced to `no`.
-
-When the contract is satisfied we return a placeholder ACCEPTED with a fake
-ticket_id and an empty evidence_pack. The full pipeline (embed → vector
-search → category → duplicate → urgency) is deliberately not built here; it
-plugs in where `_run_pipeline_stub` sits today.
-"""
+from __future__ import annotations
 
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from app.whatsapp.schemas import (
-    Accepted,
-    FollowUpPrompt,
-    NeedsMoreInfo,
-    TicketIntake,
-)
+from app.whatsapp.schemas import Accepted, FollowUpPrompt, NeedsMoreInfo
+
+REQUIRED_KEYS = ("DESCRIPTION", "INTERSECTION", "WARD")
 
 
-def _check_missing(ticket: TicketIntake) -> list[FollowUpPrompt]:
+def _parse_ticket_text(ticket_text: str) -> dict[str, str]:
+    lines = [line.strip() for line in ticket_text.splitlines() if line.strip()]
+    if not lines or lines[0] != "TICKET_TEXT_V1":
+        return {}
+
+    parsed: dict[str, str] = {}
+    for line in lines[1:]:
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        parsed[key.strip().upper()] = value.strip()
+    return parsed
+
+
+def _missing_prompts(fields: dict[str, str]) -> list[FollowUpPrompt]:
     prompts: list[FollowUpPrompt] = []
-
-    if not ticket.description or not ticket.description.strip():
+    if not fields.get("DESCRIPTION"):
         prompts.append(
             FollowUpPrompt(
-                field="description",
-                prompt="Can you describe what you're seeing? A short sentence is enough.",
+                field="DESCRIPTION",
+                prompt="Can you briefly describe the issue you are reporting?",
             )
         )
-
-    if not ticket.location.has_any_field():
+    if not fields.get("INTERSECTION"):
         prompts.append(
             FollowUpPrompt(
-                field="location",
-                prompt=(
-                    "Where is the issue? A nearby intersection, address, or "
-                    "postal area is enough."
-                ),
+                field="INTERSECTION",
+                prompt="What intersection is this near? Format: street1 x street2.",
             )
         )
-
+    if not fields.get("WARD"):
+        prompts.append(
+            FollowUpPrompt(
+                field="WARD",
+                prompt="If you know it, what ward is this in?",
+            )
+        )
     return prompts
 
 
-def validate_and_run(
-    ticket: TicketIntake,
-) -> Accepted | NeedsMoreInfo:
-    missing = _check_missing(ticket)
+def validate_and_run(ticket_text: str) -> Accepted | NeedsMoreInfo:
+    parsed = _parse_ticket_text(ticket_text)
+    if not parsed:
+        return NeedsMoreInfo(
+            missing_fields=["TICKET_TEXT_V1"],
+            follow_up_prompts=[
+                FollowUpPrompt(
+                    field="TICKET_TEXT_V1",
+                    prompt=(
+                        "Please resend in this format:\n"
+                        "TICKET_TEXT_V1\n"
+                        "DESCRIPTION: ...\n"
+                        "INTERSECTION: street1 x street2\n"
+                        "WARD: ..."
+                    ),
+                )
+            ],
+        )
+
+    missing = _missing_prompts(parsed)
     if missing:
         return NeedsMoreInfo(
             missing_fields=[p.field for p in missing],
             follow_up_prompts=missing,
         )
 
-    # Pipeline stub. Replace with: validate → normalize location → embed →
-    # category inference → historical retrieval → active duplicate → urgency.
-    return _run_pipeline_stub(ticket)
+    return _run_pipeline_stub(ticket_text=ticket_text, fields=parsed)
 
 
-def _run_pipeline_stub(ticket: TicketIntake) -> Accepted:
+def _run_pipeline_stub(*, ticket_text: str, fields: dict[str, str]) -> Accepted:
     ticket_id = f"ticket-{uuid4().hex[:12]}"
     canonical = {
         "ticket_id": ticket_id,
-        "source": ticket.source,
-        "description": ticket.description,
-        "location": ticket.location.model_dump(),
-        "observed_at": ticket.observed_at.isoformat() if ticket.observed_at else None,
+        "source": "whatsapp",
+        "description": fields.get("DESCRIPTION", ""),
+        "intersection": fields.get("INTERSECTION", ""),
+        "ward": fields.get("WARD", ""),
         "reported_at": datetime.now(timezone.utc).isoformat(),
-        "safety_answers": ticket.safety_answers.model_dump(),
-        "hazard_flags": {
-            k: (True if v == "yes" else False if v == "no" else None)
-            for k, v in ticket.safety_answers.model_dump().items()
-        },
-        "media_refs": ticket.media_refs,
+        "ticket_text": ticket_text,
     }
     return Accepted(
         ticket_id=ticket_id,

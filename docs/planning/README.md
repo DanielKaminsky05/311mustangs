@@ -1,94 +1,166 @@
-# Resolution Engine Planning Notes
+# Resolution Engine System Plan
 
-## Context 
+## Product goal
 
-The 311 service is fundamentally bottlenecked by the fact that humans need to review a massive incoming stream of service requests and go through a bueraucratic process to be able to deploy actual operations to resolve this. This creates 2 problems:
+The system helps a government employee review incoming 311-style reports by detecting when a new WhatsApp request is probably related to an existing unresolved issue.
 
-1. human review is slow and bottlenecked 
-2. operation decisions may not be optimal because the human may brainstorm locally optimal solutions but fail at a globally efficient solution that does not stall the city's daily normal operations (ie. road fix schedulings may sound coherent on its own but paralyze an entire traffic route)
+The finished system should turn a conversational citizen report into a traceable backend ticket, store it, embed it for semantic search, compare it against previously stored requests, and launch an async NemoClaw agent when deeper duplicate/urgency analysis is needed.
 
-This folder is a working dump of sanity-check feedback and implementation directions for the 311 Mustangs resolution engine concept.
-
-The goal is to keep the idea space broad while separating concerns enough that each area can be iterated independently.
-
-## implementation priority
-
-The immediate implementation priority is to satisfy the hackathon's strongest judging requirements first: a working, NVIDIA-backed DGX Spark data and inference pipeline. The multi-layer graph, Redis materialized DAG, and polished scheduling story are now **nice-to-have bonus features**, not the critical path.
-
-### Critical path
-
-Focus first on the 311 Service Requests dataset and the DGX Spark retrieval/ranking pipeline:
+## End-to-end data flow
 
 ```text
-311 Service Requests
-  -> RAPIDS/cuDF ingestion + profiling on DGX Spark
-  -> deterministic structured_text construction
-  -> DGX-local embedding generation
-  -> GPU vector index/search, preferably cuVS or FAISS-GPU
-  -> live request embed-and-search
-  -> deterministic dedupe/ranking scores
-  -> DGX-local agent LLM explanation over audited tool outputs
+1. Citizen talks with the WhatsApp intake agent conversationally.
+
+2. The WhatsApp agent collects the minimum facts needed for a request:
+   - description
+   - street1 x street2 intersection when available
+   - ward when available
+
+3. The agent submits a signed request webhook to the backend.
+
+4. The backend parses the request and creates durable SQLite records:
+   - intake event / webhook event
+   - ticket/request row
+   - initial status = unresolved
+   - normalized structured text used for embedding
+
+5. The backend embeds the structured request text.
+
+6. The backend stores the embedding in the local vector DB, keyed by the SQLite ticket ID.
+
+7. The backend searches the vector DB for semantically similar stored requests.
+
+8. If no strong similar unresolved request exists:
+   - keep the ticket as a normal unresolved request
+   - expose it to the dashboard as a new request
+
+9. If a similar unresolved request exists:
+   - create duplicate-candidate records in SQLite
+   - launch an async NemoClaw analysis agent
+
+10. The NemoClaw agent investigates candidate duplicates across available datasets, then writes back:
+    - duplicate reasoning
+    - ranked/evaluated urgency
+    - evidence references
+    - trace events
+    - suggested employee action
+
+11. The dashboard shows the government employee:
+    - the incoming ticket
+    - similar unresolved requests
+    - duplicate count/evidence
+    - agent trace
+    - urgency/ranking suggestion
+    - approve/reject/action controls
 ```
 
-This path gives the clearest systems-engineering and NVIDIA-stack story. It uses real city-scale data, runs locally, avoids external API dependency for core inference, and directly supports the product's most important behavior: ranking, duplicate detection, and grounded operator explanation.
+## Request text contract
 
-### Deprioritized for now
-
-Do not block the core DGX work on:
+The WhatsApp agent should submit one structured text block that is both human-readable and embedding-ready:
 
 ```text
-Redis graph/DAG implementation
-multi-layer spatial graph context engineering
-full backend API schema
-frontend/dashboard polish
-cuOpt route optimization
-true geospatial crew dispatch
+TICKET_TEXT_V1
+DESCRIPTION: <citizen issue description>
+INTERSECTION: <street 1> x <street 2>
+WARD: <ward or UNKNOWN>
 ```
 
-A rough scheduling stub is enough for the first demo. Treat it as **ranked queue insertion**, not global optimization:
+This text is the canonical embedding input. The backend stores it exactly, hashes it, embeds it, and links the vector DB entry back to the SQLite ticket ID.
+
+Images and media are out of scope for the current request webhook.
+
+## Backend responsibilities
+
+The backend owns:
+
+- webhook authentication and idempotency;
+- ticket ID generation;
+- parsing the structured request text;
+- SQLite persistence;
+- unresolved/open status tracking;
+- local embedding generation;
+- vector DB upsert/search;
+- duplicate-candidate creation;
+- async NemoClaw agent launch;
+- storing agent trace and suggestions;
+- dashboard APIs.
+
+The WhatsApp agent owns:
+
+- conversational collection of facts;
+- asking follow-up questions;
+- producing the structured text request;
+- submitting the signed webhook.
+
+The WhatsApp agent should not decide final duplicate status, urgency, routing, or dashboard recommendation.
+
+## Storage model
+
+SQLite is the source of truth for application state. The vector DB is the semantic lookup index.
+
+Core SQLite records:
 
 ```text
-group active low-priority 311 records by ward, service_request_type, section, and available street/intersection tokens
-insert a new low-priority request into the closest matching batch
-persist/display the ranked insertion and explanation
+intake_events
+  Stores webhook event ID, request payload, response payload, and idempotency state.
+
+tickets
+  Stores each accepted request, parsed fields, unresolved/resolved status, structured text, text hash, and vector reference.
+
+duplicate_candidates
+  Stores similar request matches returned from vector search, including score and candidate status.
+
+agent_runs
+  Stores async NemoClaw analysis jobs for tickets with likely duplicates.
+
+agent_trace_events
+  Stores the reasoning/tool trace produced by NemoClaw.
+
+review_cases
+  Stores the dashboard-facing case, recommendation, urgency/ranking result, and employee review state.
 ```
 
-### Personal implementation scope
-
-The owner of the DGX/data path should build:
+Vector DB records:
 
 ```text
-scripts/data/build_311_index.py
-scripts/dgx/embed_311.py
-scripts/dgx/serve_embed_search.py
-scripts/demo/run_311_dedupe_cases.py
-var/311mustangs.sqlite
-var/service_requests_all.faiss or var/service_requests_all.cuvs
-var/service_requests_active.faiss or var/service_requests_active.cuvs
-var/data_pipeline_report.md
+point_id = SQLite ticket ID
+vector = embedding(TICKET_TEXT_V1 block)
+payload = ticket ID, status, text hash, intersection, ward
 ```
 
-Teammates can continue backend API and frontend/dashboard work against these artifacts. Once the 311 DGX path works, noise permits and utility cuts can be reintroduced as simple evidence lookups. The graph/DAG layer should only be revisited after the NVIDIA-backed embedding, retrieval, ranking, and agent inference loop is working end-to-end.
+## Async NemoClaw analysis
 
-### Pitch discipline
+NemoClaw should launch only when the backend finds a meaningful similar unresolved request.
 
-Lead with:
+Trigger condition:
 
-> DGX Spark powers a local 311 resolution engine: RAPIDS processes Toronto Open Data, NVIDIA-backed embeddings index 190k+ service requests, GPU vector search grounds every new request in historical analogs, and a local agent explains audited ranking/deduplication decisions.
+```text
+new ticket is unresolved
+AND vector DB returns one or more similar unresolved candidates above threshold
+```
 
-Do not lead with:
+NemoClaw output should be persisted, not just returned transiently:
 
-> We built a globally optimal geospatial scheduling DAG.
+```text
+duplicate reasoning
+ranked candidate list
+urgency/ranking evaluation
+evidence references
+trace events
+suggested employee action
+```
 
-That claim is higher risk because the current 311 data has only coarse location fields. The graph/scheduling layer can still help the demo stand out, but it should not distract from the higher-return DGX Spark core.
+## Dashboard outcome
 
-## Component notes
+The completed dashboard should let a government employee answer:
 
-- [Proposal](./proposal.md) — overall solution framing and component responsibilities
-- [Data](./data.md) — dataset scope, pipeline artifacts, and data handoff contracts
-- [Backend](./backend.md) — backend runtime design, Redis/SQLite notes, and API draft
-- [Frontend](./frontend.md) — operator dashboard scope, screens, file upload, and backend data contract
-- [Agents](./agents.md) — multi-agent architecture, NemoClaw/OpenClaw/LangGraph integration, and shared DGX vLLM serving plan
-- [DGX Spark / NVIDIA stack](./spark-usage.md) — current NVIDIA ecosystem usage and judging-aligned implementation priorities
-- [Criteria](./criteria.md) — hackathon judging rubric
-- [NVIDIA suggestions archive](./nvidia-suggestion.md) — older NVIDIA planning notes; use as reference only
+```text
+What is this incoming issue?
+Has something similar already been reported?
+Is the similar request still unresolved?
+Why does the agent think this is a duplicate?
+How urgent is this compared with other unresolved reports?
+What action should I take?
+```
+
+The dashboard does not run embeddings or agents directly. It reads persisted backend records and writes employee review actions back to SQLite.

@@ -18,6 +18,7 @@ async def post_inbound_message(
     message_id: str,
     text: str,
     media_refs: list[str],
+    twilio_from: str,
     location_pin: dict | None,
 ) -> None:
     """Best-effort POST to the sandbox. Errors are logged, not raised — the
@@ -33,6 +34,7 @@ async def post_inbound_message(
         "message_id": message_id,
         "text": text,
         "media_refs": media_refs,
+        "twilio_from": twilio_from,
         "location_pin": location_pin,
     }
     try:

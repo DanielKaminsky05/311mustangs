@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     sandbox_message_url: str = ""         # POST URL on the GX10 sandbox for inbound messages
     sender_hash_salt: str = "change-me-salt"  # salts the sha256 of Twilio's `From` field
 
+    # Local vector stack (MVP): FastEmbed + Qdrant
+    vector_enabled: bool = False
+    qdrant_url: str = ""                # e.g. "http://localhost:6333"
+    qdrant_api_key: str = ""
+    qdrant_collection: str = "tickets_v1"
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+
 
 @lru_cache
 def get_settings() -> Settings:
