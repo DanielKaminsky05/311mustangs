@@ -109,7 +109,10 @@ async def extract_and_decide(
         ],
     }
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    # gemma4:26b with a hidden reasoning block + up to 3000 output tokens can
+    # take well over 60s per turn on the GX10; give inference generous headroom
+    # so the edge->agent->ticket path doesn't ReadTimeout mid-extraction.
+    async with httpx.AsyncClient(timeout=180.0) as client:
         # OpenAI-compatible chat completions. Works both inside the sandbox
         # (http://host.openshell.internal:11434/v1/chat/completions, routed
         # through the local-inference preset) and outside against Ollama
