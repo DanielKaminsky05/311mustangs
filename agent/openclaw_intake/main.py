@@ -32,7 +32,10 @@ class Settings:
         self.inference_base_url = os.environ.get(
             "INFERENCE_BASE_URL", "http://host.openshell.internal:11434"
         ).rstrip("/")
-        self.inference_model = os.environ.get("INFERENCE_MODEL", "gemma4:26b")
+        # qwen3.6:35b is the verified-reliable structured-extraction model on
+        # the GX10; gemma4:26b returns inconsistent/malformed JSON for this
+        # nested schema. Override via INFERENCE_MODEL if needed.
+        self.inference_model = os.environ.get("INFERENCE_MODEL", "qwen3.6:35b")
 
 
 @asynccontextmanager
